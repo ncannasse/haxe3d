@@ -2,11 +2,9 @@ package h3d.mat;
 
 class Texture {
 
-	public var file(default,null) : String;
 	public var bitmap : flash.display.BitmapData;
 
-	public function new( file : String ) {
-		this.file = file;
+	public function new() {
 		bitmap = EMPTY_BITMAP;
 	}
 

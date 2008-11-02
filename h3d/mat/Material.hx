@@ -10,7 +10,7 @@ class Material {
 		id = ++UID;
 	}
 
-	public function setup( display : h3d.Display ) {
+	public function setup( display : h3d.Display, bitmapMode : Bool  ) {
 		// TO OVERRIDE
 	}
 

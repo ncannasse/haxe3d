@@ -3,7 +3,7 @@ package h3d.tools;
 class Collada {
 
 	public var materials : Hash<h3d.mat.Material>;
-	public var textures : Hash<h3d.mat.Texture>;
+	public var textures : Hash<{ file : String, texture : h3d.mat.Texture }>;
 	public var objects : Hash<h3d.Object>;
 
 	public function new() {
@@ -47,9 +47,9 @@ class Collada {
 	function buildVertex( vdata : flash.Vector<Float> ) {
 		var i = 0;
 		var max = Std.int(vdata.length / 3);
-		var vl = new haxe.FastList<h3d.Vector>();
+		var vl = new flash.Vector();
 		for( p in 0...max )
-			vl.add( new h3d.Vector(vdata[i++],vdata[i++],vdata[i++]) );
+			vl[p] = new h3d.Vector(vdata[i++],vdata[i++],vdata[i++]);
 		return vl;
 	}
 
@@ -60,7 +60,7 @@ class Collada {
 		// load textures
 		for( i in x.node.library_images.nodes.image ) {
 			var file = i.node.init_from.innerData;
-			textures.set(i.att.id,new h3d.mat.Texture(file));
+			textures.set(i.att.id,{ file : file, texture : new h3d.mat.Texture() });
 		}
 		// load material effects
 		var matfx = new Hash();
@@ -85,7 +85,7 @@ class Collada {
 			var mat = if( dif.hasNode.texture ) {
 				var sampler = dif.node.texture.att.texture;
 				var img = resolve(resolve(sampler,params),params);
-				new h3d.mat.BitmapMaterial(ambient,resolve(img,textures));
+				new h3d.mat.BitmapMaterial(ambient,resolve(img,textures).texture);
 			} else if( dif.hasNode.color ) {
 				var col = parseColor(dif.node.color.innerData);
 				new h3d.mat.ColorMaterial(ambient,col);
@@ -163,6 +163,7 @@ class Collada {
 			var pos = 0;
 			var max = indexes.length;
 			var dstride = stride * 2;
+			var hasUV = tinf != null;
 			while( pos < max ) {
 				p.addTriangle(
 					indexes[pos + voffset],
@@ -171,12 +172,13 @@ class Collada {
 					indexes[pos + noffset],
 					indexes[pos + stride + noffset],
 					indexes[pos + dstride + noffset],
-					indexes[pos + toffset],
-					indexes[pos + stride + toffset],
-					indexes[pos + dstride + toffset]
+					hasUV ? indexes[pos + toffset] : 0,
+					hasUV ? indexes[pos + stride + toffset] : 0,
+					hasUV ? indexes[pos + dstride + toffset] : 0
 				);
 				pos += stride + dstride;
 			}
+			p.done();
 		}
 		// load objects
 		for( scene in x.node.library_visual_scenes.nodes.visual_scene )

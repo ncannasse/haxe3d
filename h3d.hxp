@@ -1,12 +1,12 @@
 ﻿<haxe selected="0">
-  <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="" main="True" debug="False">-swf-version 10
--swf-header 800:600:40
-
--resource res/axisCube.dae</output>
+  <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="" main="True" debug="True">-swf-version 10
+-swf-header 800:600:40</output>
   <files path="/">
     <dir path="h3d">
       <dir path="internal">
         <file path="h3d\internal\PrimInst.hx" />
+        <file path="h3d\internal\Triangle.hx" />
+        <file path="h3d\internal\Vertex.hx" />
         <file path="h3d\internal\ZTriangle.hx" />
       </dir>
       <dir path="mat">
