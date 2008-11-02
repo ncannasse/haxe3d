@@ -1,0 +1,7 @@
+# Flash10
+-swf9 h3d.swf
+-main Test
+-swf-version 10
+-swf-header 800:600:40
+
+-resource res/axisCube.dae

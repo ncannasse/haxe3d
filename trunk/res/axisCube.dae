@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">
+	<asset>
+		<contributor>
+			<author>Illusoft Collada 1.4.0 plugin for Blender - http://colladablender.illusoft.com</author>
+			<authoring_tool>Blender v:248 - Illusoft Collada Exporter v:0.3.160</authoring_tool>
+			<comments></comments>
+			<copyright></copyright>
+			<source_data>file://D:/Projects/haxe3d/res/axisCube.blend</source_data>
+		</contributor>
+		<created>2008-11-02T20:50:48.437000</created>
+		<modified>2008-11-02T20:50:48.437000</modified>
+		<unit meter="0.01" name="centimeter"/>
+		<up_axis>Z_UP</up_axis>
+	</asset>
+	<library_cameras>
+		<camera id="Camera-Camera" name="Camera-Camera">
+			<optics>
+				<technique_common>
+					<perspective>
+						<yfov>49.13434</yfov>
+						<znear>0.1</znear>
+						<zfar>100.0</zfar>
+					</perspective>
+				</technique_common>
+			</optics>
+		</camera>
+	</library_cameras>
+	<library_effects>
+		<effect id="Material_001-fx" name="Material_001-fx">
+			<profile_COMMON>
+				<newparam sid="bricks_jpg">
+					<surface type="2D">
+						<init_from>bricks_jpg-img</init_from>
+						<format>A8R8G8B8</format>
+					</surface>
+				</newparam>
+				<newparam sid="bricks_jpg-sampler">
+					<sampler2D>
+						<source>bricks_jpg</source>
+						<minfilter>LINEAR_MIPMAP_LINEAR</minfilter>
+						<magfilter>LINEAR</magfilter>
+					</sampler2D>
+				</newparam>
+				<technique sid="blender">
+					<phong>
+						<emission>
+							<color>0.00000 0.00000 0.00000 1</color>
+						</emission>
+						<ambient>
+							<color>0.50000 0.24675 0.00000 1</color>
+						</ambient>
+						<diffuse>
+							<texture texcoord="CHANNEL1" texture="bricks_jpg-sampler"/>
+						</diffuse>
+						<specular>
+							<color>0.50000 0.50000 0.50000 1</color>
+						</specular>
+						<shininess>
+							<float>12.5</float>
+						</shininess>
+						<reflective>
+							<color>1.00000 1.00000 1.00000 1</color>
+						</reflective>
+						<reflectivity>
+							<float>0.0</float>
+						</reflectivity>
+						<transparent>
+							<color>1 1 1 1</color>
+						</transparent>
+						<transparency>
+							<float>0.0</float>
+						</transparency>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+		<effect id="Material-fx" name="Material-fx">
+			<profile_COMMON>
+				<technique sid="blender">
+					<phong>
+						<emission>
+							<color>0.00000 0.00000 0.00000 1</color>
+						</emission>
+						<ambient>
+							<color>0.11592 0.06194 0.29241 1</color>
+						</ambient>
+						<diffuse>
+							<color>0.23184 0.12388 0.58482 1</color>
+						</diffuse>
+						<specular>
+							<color>0.50000 0.50000 0.50000 1</color>
+						</specular>
+						<shininess>
+							<float>12.5</float>
+						</shininess>
+						<reflective>
+							<color>1.00000 1.00000 1.00000 1</color>
+						</reflective>
+						<reflectivity>
+							<float>0.0</float>
+						</reflectivity>
+						<transparent>
+							<color>1 1 1 1</color>
+						</transparent>
+						<transparency>
+							<float>0.0</float>
+						</transparency>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_images>
+		<image id="bricks_jpg-img" name="bricks_jpg-img">
+			<init_from>D:\Projects\haxe3d\res\bricks.jpg</init_from>
+		</image>
+	</library_images>
+	<library_lights>
+		<light id="Lamp-Light" name="Lamp-Light">
+			<technique_common>
+				<point>
+					<color>1.00000 1.00000 1.00000</color>
+					<constant_attenuation>1.0</constant_attenuation>
+					<linear_attenuation>0.0</linear_attenuation>
+					<quadratic_attenuation>0.0</quadratic_attenuation>
+				</point>
+			</technique_common>
+		</light>
+	</library_lights>
+	<library_materials>
+		<material id="Material_001" name="Material_001">
+			<instance_effect url="#Material_001-fx"/>
+		</material>
+		<material id="Material" name="Material">
+			<instance_effect url="#Material-fx"/>
+		</material>
+	</library_materials>
+	<library_geometries>
+		<geometry id="Cube_001-Geometry" name="Cube_001-Geometry">
+			<mesh>
+				<source id="Cube_001-Geometry-Position">
+					<float_array count="24" id="Cube_001-Geometry-Position-array">1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000 1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000</float_array>
+					<technique_common>
+						<accessor count="8" source="#Cube_001-Geometry-Position-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Cube_001-Geometry-Normals">
+					<float_array count="18" id="Cube_001-Geometry-Normals-array">0.00000 0.00000 -1.00000 0.00000 -0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -1.00000 -0.00000 -1.00000 0.00000 -0.00000 0.00000 1.00000 0.00000</float_array>
+					<technique_common>
+						<accessor count="6" source="#Cube_001-Geometry-Normals-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Cube_001-Geometry-UV">
+					<float_array count="72" id="Cube_001-Geometry-UV-array">0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000 0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000 0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000 0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000 0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000 0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 1.00000 1.00000 0.00000 1.00000 0.00000 0.00000</float_array>
+					<technique_common>
+						<accessor count="36" source="#Cube_001-Geometry-UV-array" stride="2">
+							<param type="float" name="S"></param>
+							<param type="float" name="T"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="Cube_001-Geometry-Vertex">
+					<input semantic="POSITION" source="#Cube_001-Geometry-Position"/>
+				</vertices>
+				<triangles count="12" material="Material_001">
+					<input offset="0" semantic="VERTEX" source="#Cube_001-Geometry-Vertex"/>
+					<input offset="1" semantic="NORMAL" source="#Cube_001-Geometry-Normals"/>
+					<input offset="2" semantic="TEXCOORD" source="#Cube_001-Geometry-UV"/>
+					<p>0 0 0 1 0 1 2 0 2 2 0 3 3 0 4 0 0 5 4 1 6 7 1 7 6 1 8 6 1 9 5 1 10 4 1 11 0 2 12 4 2 13 5 2 14 5 2 15 1 2 16 0 2 17 1 3 18 5 3 19 6 3 20 6 3 21 2 3 22 1 3 23 2 4 24 6 4 25 7 4 26 7 4 27 3 4 28 2 4 29 4 5 30 0 5 31 3 5 32 3 5 33 7 5 34 4 5 35</p>
+				</triangles>
+			</mesh>
+		</geometry>
+		<geometry id="Cube-Geometry" name="Cube-Geometry">
+			<mesh>
+				<source id="Cube-Geometry-Position">
+					<float_array count="24" id="Cube-Geometry-Position-array">0.00638 1.00121 -1.04994 0.73893 -0.85980 -1.04994 -0.73893 -0.85980 -1.04994 -0.00638 1.00121 -1.04994 0.00638 1.00121 1.04994 0.73893 -0.85981 1.04994 -0.73893 -0.85980 1.04994 -0.00638 1.00121 1.04994</float_array>
+					<technique_common>
+						<accessor count="8" source="#Cube-Geometry-Position-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Cube-Geometry-Normals">
+					<float_array count="18" id="Cube-Geometry-Normals-array">0.00000 0.00000 -1.00000 0.00000 -0.00000 1.00000 0.93051 0.36627 0.00000 -0.00000 -1.00000 -0.00000 -0.93051 0.36627 -0.00000 0.00002 1.00000 0.00000</float_array>
+					<technique_common>
+						<accessor count="6" source="#Cube-Geometry-Normals-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="Cube-Geometry-Vertex">
+					<input semantic="POSITION" source="#Cube-Geometry-Position"/>
+				</vertices>
+				<triangles count="12" material="Material">
+					<input offset="0" semantic="VERTEX" source="#Cube-Geometry-Vertex"/>
+					<input offset="1" semantic="NORMAL" source="#Cube-Geometry-Normals"/>
+					<p>0 0 1 0 2 0 2 0 3 0 0 0 4 1 7 1 6 1 6 1 5 1 4 1 0 2 4 2 5 2 5 2 1 2 0 2 1 3 5 3 6 3 6 3 2 3 1 3 2 4 6 4 7 4 7 4 3 4 2 4 4 5 0 5 3 5 3 5 7 5 4 5</p>
+				</triangles>
+			</mesh>
+		</geometry>
+	</library_geometries>
+	<library_visual_scenes>
+		<visual_scene id="Scene" name="Scene">
+			<node layer="L1" id="Lamp" name="Lamp">
+				<matrix>
+					1.0 0.0 0.0 3.18476 
+					0.0 1.0 0.0 -1.65623 
+					0.0 0.0 1.0 6.36276 
+					0.0 0.0 0.0 1.0 
+				</matrix>
+				<instance_light url="#Lamp-Light"/>
+			</node>
+			<node layer="L1" id="Camera" name="Camera">
+				<matrix>
+					0.16322 -0.42814 0.52768 7.74966 
+					0.67317 0.02786 -0.18561 -3.87117 
+					0.09268 0.55164 0.41891 8.24045 
+					0.0 0.0 0.0 1.0 
+				</matrix>
+				<instance_camera url="#Camera-Camera"/>
+			</node>
+			<node layer="L1" id="Cube_001" name="Cube_001">
+				<matrix>
+					1.0 0.0 0.0 -2.18211 
+					0.0 1.0 0.0 -0.47139 
+					0.0 0.0 1.0 0.76691 
+					0.0 0.0 0.0 1.0 
+				</matrix>
+				<instance_geometry url="#Cube_001-Geometry">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="Material_001" target="#Material_001">
+								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
+							</instance_material>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+			</node>
+			<node layer="L1" id="Cube" name="Cube">
+				<matrix>
+					1.0 0.0 0.0 0.0 
+					0.0 3.01813 0.0 0.0 
+					0.0 0.0 1.0 0.0 
+					0.0 0.0 0.0 1.0 
+				</matrix>
+				<instance_geometry url="#Cube-Geometry">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="Material" target="#Material">
+								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
+							</instance_material>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+			</node>
+		</visual_scene>
+	</library_visual_scenes>
+	<scene>
+		<instance_visual_scene url="#Scene"/>
+	</scene>
+</COLLADA>
