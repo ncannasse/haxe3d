@@ -1,0 +1,37 @@
+﻿<haxe selected="0">
+  <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="" main="True" debug="False">-swf-version 10
+-swf-header 800:600:40
+
+-resource res/axisCube.dae</output>
+  <files path="/">
+    <dir path="h3d">
+      <dir path="internal">
+        <file path="h3d\internal\PrimInst.hx" />
+        <file path="h3d\internal\ZTriangle.hx" />
+      </dir>
+      <dir path="mat">
+        <file path="h3d\mat\BitmapMaterial.hx" />
+        <file path="h3d\mat\Color.hx" />
+        <file path="h3d\mat\ColorMaterial.hx" />
+        <file path="h3d\mat\Material.hx" />
+        <file path="h3d\mat\Texture.hx" />
+        <file path="h3d\mat\UV.hx" />
+      </dir>
+      <dir path="prim">
+        <file path="h3d\prim\Primitive.hx" />
+      </dir>
+      <dir path="tools">
+        <file path="h3d\tools\Collada.hx" />
+        <file path="h3d\tools\Loader.hx" />
+      </dir>
+      <file path="h3d\Camera.hx" />
+      <file path="h3d\Const.hx" />
+      <file path="h3d\Display.hx" />
+      <file path="h3d\Matrix.hx" />
+      <file path="h3d\Object.hx" />
+      <file path="h3d\Vector.hx" />
+      <file path="h3d\World.hx" />
+    </dir>
+    <file path="Test.hx" />
+  </files>
+</haxe>
