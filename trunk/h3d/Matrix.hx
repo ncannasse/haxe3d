@@ -80,10 +80,10 @@ class Matrix {
 
 	public function toString() {
 		return "MAT=[\n" +
-			"  [" + Const.f(_11) + "," + Const.f(_12) + "," + Const.f(_13) + "," + Const.f(_14) + "]\n" +
-			"  [" + Const.f(_21) + "," + Const.f(_22) + "," + Const.f(_23) + "," + Const.f(_24) + "]\n" +
-			"  [" + Const.f(_31) + "," + Const.f(_32) + "," + Const.f(_33) + "," + Const.f(_34) + "]\n" +
-			"  [" + Const.f(_41) + "," + Const.f(_42) + "," + Const.f(_43) + "," + Const.f(_44) + "]\n" +
+			"  [ " + Const.f(_11) + ", " + Const.f(_12) + ", " + Const.f(_13) + ", " + Const.f(_14) + " ]\n" +
+			"  [ " + Const.f(_21) + ", " + Const.f(_22) + ", " + Const.f(_23) + ", " + Const.f(_24) + " ]\n" +
+			"  [ " + Const.f(_31) + ", " + Const.f(_32) + ", " + Const.f(_33) + ", " + Const.f(_34) + " ]\n" +
+			"  [ " + Const.f(_41) + ", " + Const.f(_42) + ", " + Const.f(_43) + ", " + Const.f(_44) + " ]\n" +
 		"]";
 	}
 

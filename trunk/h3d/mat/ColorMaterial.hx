@@ -13,8 +13,11 @@ class ColorMaterial extends Material {
 		rgb = diffuse.toInt();
 	}
 
-	override function setup( display : h3d.Display ) {
-		display.g.beginFill(rgb,diffuse.a);
+	override function setup( display : h3d.Display, bitmapMode ) {
+		if( bitmapMode )
+			display.gbitmap.beginFill(0xFFFFFF);
+		else
+			display.gcolor.beginFill(rgb,diffuse.a);
 	}
 
 }
