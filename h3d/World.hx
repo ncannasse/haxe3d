@@ -9,7 +9,7 @@ class World {
 	var vbuf : flash.Vector<Float>;
 	var zbuf : flash.Vector<Float>;
 	var uvbuf : flash.Vector<Float>;
-	var tbuf : flash.Vector<h3d.internal.ZTriangle>;
+	var tbuf : flash.Vector<h3d.internal.Triangle>;
 
 	public function new( display, camera ) {
 		this.camera = camera;
@@ -26,7 +26,7 @@ class World {
 		objects.add(o);
 	}
 
-	function zsort( t1 : h3d.internal.ZTriangle, t2 : h3d.internal.ZTriangle ) {
+	function zsort( t1 : h3d.internal.Triangle, t2 : h3d.internal.Triangle ) {
 		return ( t1.z > t2.z ) ? -1 : 1;
 	}
 
@@ -46,30 +46,38 @@ class World {
 		var vindex = 0, tindex = 0, uvindex = 0;
 		for( o in objects ) {
 			m.multiply(o.position,camera.m);
-			for( p in o.primitives ) {
-				var zindex = 0;
+			for( pinst in o.primitives ) {
+				var prim = pinst.p;
+				// transform all points
+				var p = prim.points;
+				while( p != null ) {
+					var pw = 1.0 / (m._14 * p.x + m._24 * p.y + m._34 * p.z + m._44);
+					p.sx = (m._11 * p.x + m._21 * p.y + m._31 * p.z + m._41) * pw;
+					p.sy = (m._12 * p.x + m._22 * p.y + m._32 * p.z + m._42) * pw;
+					p.w = pw;
+					p = p.next;
+				}
+				// TODO : tranform normals
+				// TODO : lightning
+				// calculate all triangles-z
+				var t = prim.triangles;
 				var vbase = vindex >> 1;
-				var v = p.p.vertexes;
+				while( t != null ) {
+					tbuf[tindex++] = t;
+					// the triangle.z is the average of the three vertex
+					t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
+					t.ibase = vbase;
+					t = t.next;
+				}
+				// emit vertexes
+				var v = prim.vertexes;
 				while( v != null ) {
-					var px = m._11 * v.x + m._21 * v.y + m._31 * v.z + m._41;
-					var py = m._12 * v.x + m._22 * v.y + m._32 * v.z + m._42;
-					//var pz = m._13 * v.x + m._23 * v.y + m._33 * v.z + m._43;
-					var pw = 1.0 / (m._14 * v.x + m._24 * v.y + m._34 * v.z + m._44);
-					zbuf[zindex++] = pw;
-					vbuf[vindex++] = px * pw;
-					vbuf[vindex++] = py * pw;
+					vbuf[vindex++] = v.p.sx;
+					vbuf[vindex++] = v.p.sy;
 					uvbuf[uvindex++] = v.u;
 					uvbuf[uvindex++] = v.v;
-					uvbuf[uvindex++] = pw;
+					uvbuf[uvindex++] = v.p.w;
 					v = v.next;
-				}
-				var t = p.triangles;
-				while( t != null ) {
-					// the triangle.z is the average of the three vertex
-					t.z = zbuf[t.v0] + zbuf[t.v1] + zbuf[t.v2];
-					t.base = vbase;
-					tbuf[tindex++] = t;
-					t = t.next;
 				}
 			}
 		}
@@ -98,9 +106,9 @@ class World {
 					iindex = 0;
 					mat = t.material;
 				}
-				ibuf[iindex++] = t.base + t.v0;
-				ibuf[iindex++] = t.base + t.v1;
-				ibuf[iindex++] = t.base + t.v2;
+				ibuf[iindex++] = t.ibase + t.iv0;
+				ibuf[iindex++] = t.ibase + t.iv1;
+				ibuf[iindex++] = t.ibase + t.iv2;
 			}
 			mat.setup(display,false);
 			gcolor.drawTriangles(vbuf,ibuf,null,cull);

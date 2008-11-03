@@ -2,12 +2,10 @@ package h3d.mat;
 
 class Material {
 
-	static var UID = 0;
-
-	public var id(default,null) : Int;
+	public var shade(default,null) : ShadeModel;
 
 	function new() {
-		id = ++UID;
+		shade = h3d.Const.DEFAULT_SHADE_MODEL;
 	}
 
 	public function setup( display : h3d.Display, bitmapMode : Bool  ) {
