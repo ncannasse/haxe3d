@@ -83,32 +83,29 @@ class World {
 			tindex = 0;
 			var ibuf = new flash.Vector<Int>();
 			var iindex = 0;
-			var t0 = tbuf[0];
-			var old = t0.mat;
-			var oldMat = t0.material;
+			var mat = tbuf[0].material;
 			var cull = flash.display.TriangleCulling.POSITIVE;
 			while( tindex < max ) {
 				var t = tbuf[tindex++];
-				if( t.mat != old ) {
-					oldMat.setup(display,false);
+				if( t.material != mat ) {
+					mat.setup(display,false);
 					gcolor.drawTriangles(vbuf,ibuf,null,cull);
 					gcolor.endFill();
-					oldMat.setup(display,true);
+					mat.setup(display,true);
 					gbitmap.drawTriangles(vbuf,ibuf,uvbuf,cull);
 					gbitmap.endFill();
 					ibuf = new flash.Vector<Int>();
 					iindex = 0;
-					old = t.mat;
-					oldMat = t.material;
+					mat = t.material;
 				}
 				ibuf[iindex++] = t.base + t.v0;
 				ibuf[iindex++] = t.base + t.v1;
 				ibuf[iindex++] = t.base + t.v2;
 			}
-			oldMat.setup(display,false);
+			mat.setup(display,false);
 			gcolor.drawTriangles(vbuf,ibuf,null,cull);
 			gcolor.endFill();
-			oldMat.setup(display,false);
+			mat.setup(display,true);
 			gbitmap.drawTriangles(vbuf,ibuf,null,cull);
 			gbitmap.endFill();
 		}
