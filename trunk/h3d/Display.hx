@@ -46,6 +46,8 @@ class Display {
 		stage.quality = flash.display.StageQuality.LOW;
 		bitmap.lock();
 		bitmap.fillRect(bitmap.rect,0);
+		// I would prefer to draw the three shapes by hand
+		// but this crash the flash player 10
 		bitmap.draw(scene);
 		bitmap.unlock();
 		gcolor.clear();
