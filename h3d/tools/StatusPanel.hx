@@ -1,4 +1,4 @@
-package h3d.util;
+package h3d.tools;
 
 import flash.display.Sprite;
 import flash.display.Bitmap;
