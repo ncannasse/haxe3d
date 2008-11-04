@@ -41,9 +41,6 @@ class Display {
 	}
 
 	public function endDraw() {
-		var stage = flash.Lib.current.stage;
-		var old = stage.quality;
-		stage.quality = flash.display.StageQuality.LOW;
 		bitmap.lock();
 		bitmap.fillRect(bitmap.rect,0);
 		// I would prefer to draw the three shapes by hand
@@ -53,7 +50,6 @@ class Display {
 		gcolor.clear();
 		gbitmap.clear();
 		ghud.clear();
-		stage.quality = old;
 	}
 
 }

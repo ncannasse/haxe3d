@@ -1,5 +1,5 @@
 ﻿<haxe selected="0">
-  <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="" main="True" debug="True">-swf-version 10
+  <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="h3d.html" main="True" debug="False">-swf-version 10
 -swf-header 800:600:40</output>
   <files path="/">
     <dir path="h3d">
@@ -8,6 +8,7 @@
         <file path="h3d\internal\Point.hx" />
         <file path="h3d\internal\PrimInst.hx" />
         <file path="h3d\internal\PrimTmpData.hx" />
+        <file path="h3d\internal\Stats.hx" />
         <file path="h3d\internal\Triangle.hx" />
         <file path="h3d\internal\Vertex.hx" />
       </dir>
@@ -26,6 +27,7 @@
       <dir path="tools">
         <file path="h3d\tools\Collada.hx" />
         <file path="h3d\tools\Loader.hx" />
+        <file path="h3d\tools\StatusPanel.hx" />
       </dir>
       <file path="h3d\Camera.hx" />
       <file path="h3d\Const.hx" />

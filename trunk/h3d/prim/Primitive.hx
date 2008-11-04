@@ -59,6 +59,11 @@ class Primitive {
 		t.v0 = tmpData.avertexes[t.iv0];
 		t.v1 = tmpData.avertexes[t.iv1];
 		t.v2 = tmpData.avertexes[t.iv2];
+		// calculate face-normal
+		t.n = new h3d.internal.Normal(tmpData.v0);
+		t.n.x = (t.v0.n.x + t.v1.n.x + t.v2.n.x) / 3;
+		t.n.y = (t.v0.n.y + t.v1.n.y + t.v2.n.y) / 3;
+		t.n.z = (t.v0.n.z + t.v1.n.z + t.v2.n.z) / 3;
 		t.material = material;
 		t.next = triangles;
 		triangles = t;
