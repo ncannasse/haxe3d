@@ -25,6 +25,8 @@ class StatusPanel extends Sprite {
 	
 	static var initialized = false;
 	
+	public var world(default,null) : h3d.World;
+	
 	var w : Int;
 	var h : Int;
 	var graph : BitmapData;
@@ -42,12 +44,15 @@ class StatusPanel extends Sprite {
 	var mem 	: Float;
 	var mouseDown : Bool;
 	
+	var tf_objects 	: TextField;
 	
-	public function new( ?w : Int, ?h : Int ) {
+	
+	public function new( world : h3d.World, ?w : Int, ?h : Int ) {
 		
 		super();
+		this.world = world;
 		this.w = ( w != null ) ? w : DEFAULT_WIDTH;
-		this.h = ( h != null ) ? h : 50;
+		this.h = ( h != null ) ? h : 150;
 		
 		graph_h = 50;
 		mouseDown = false;
@@ -63,12 +68,12 @@ class StatusPanel extends Sprite {
 		
 		graph = new BitmapData( w, graph_h, false, 0x333333 );
 		var bmp = new Bitmap( graph );
-		bmp.y = 70;
+		bmp.y = 125;
 		addChild( bmp );
 		
 		graph_hi = new BitmapData( w, graph_h, false, 0x333333 );
 		var bmp = new Bitmap( graph_hi );
-		bmp.y = 70 + graph_h;
+		bmp.y = 125 + graph_h;
 		addChild( bmp );
 		
 		format = new TextFormat( "__sans", 8 );
@@ -98,6 +103,15 @@ class StatusPanel extends Sprite {
 		tf_mem.textColor = 0x00FFFF;
 		tf_mem.text = "MEM: ";
 		addChild( tf_mem );
+		
+		tf_objects = new TextField();
+		tf_objects.selectable = false;
+		tf_objects.defaultTextFormat = format;
+		tf_objects.width = w;
+		tf_objects.y = 30;
+		tf_objects.textColor = 0xcccccc;
+		tf_objects.text = "MSHS: ";
+		addChild( tf_objects );
 		
 		addEventListener( MouseEvent.MOUSE_DOWN, mouseDownHandler );
 		addEventListener( MouseEvent.CLICK, mouseClickHandler );
@@ -172,6 +186,21 @@ class StatusPanel extends Sprite {
 		
 		tf_ms.text = "MS: " + ( timer - ms );
 		ms = Std.int( timer );
+		
+		var s = "";
+		var stats = world.stats;
+		s += "OBJ:  "+stats.objects;
+		s += "\nPRI: "+stats.primitives;
+		s += "\nTRI: "+stats.triangles;
+		s += "\nDCL: "+stats.drawCalls;
+		
+		s += "\nTTI: "+stats.transformTime;
+		s += "\nSTI:  "+stats.sortTime;
+		s += "\nMTI: "+stats.materialTime;
+		s += "\nDTI: "+stats.drawTime;
+		s += "\nLTI: "+stats.timeLag;
+		
+		tf_objects.text = s;
 	}
 	
 }
