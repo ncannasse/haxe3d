@@ -46,6 +46,10 @@ class Vector {
 		z *= f;
 	}
 
+	public inline function copy() {
+		return new Vector(x,y,z);
+	}
+
 	public function toString() {
 		return "{"+Const.f(x)+","+Const.f(y)+","+Const.f(z)+"}";
 	}

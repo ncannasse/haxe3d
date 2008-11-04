@@ -7,6 +7,7 @@ class PrimTmpData {
 	public var points : flash.Vector<Point>;
 	public var normals : flash.Vector<Normal>;
 	public var tcoords : flash.Vector<h3d.mat.UV>;
+	public var v0 : h3d.Vector;
 
 	public function new( ntcoords ) {
 		avertexes = new flash.Vector();
@@ -16,6 +17,7 @@ class PrimTmpData {
 		points = new flash.Vector();
 		normals = new flash.Vector();
 		tcoords = new flash.Vector();
+		v0 = new h3d.Vector();
 	}
 
 }

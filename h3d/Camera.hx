@@ -63,7 +63,7 @@ class Camera {
 		mcam._42 = -ay.dot(position);
 		mcam._43 = -az.dot(position);
 		mcam._44 = 1;
-		m.multiply(mcam,mproj);
+		m.multiply4x4(mcam,mproj);
 	}
 
 }

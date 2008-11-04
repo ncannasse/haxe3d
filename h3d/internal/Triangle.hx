@@ -10,6 +10,7 @@ class Triangle {
 	public var v0 : Vertex;
 	public var v1 : Vertex;
 	public var v2 : Vertex;
+	public var n : Normal;
 	public var material : h3d.mat.Material;
 	public var next : Triangle;
 
