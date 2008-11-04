@@ -21,6 +21,8 @@ class Test {
 		collada = loader.loadCollada("res/axisCube.dae");
 		loader.onLoaded = init;
 		loader.start();
+		var statusPanel = new h3d.tools.StatusPanel( world );
+		mc.addChild( statusPanel );
 	}
 
 	function init() {
@@ -55,7 +57,7 @@ class Test {
 		world.light.z = -1;
 		// render
 		world.render();
-		trace(world.stats);
+		//trace(world.stats);
 	}
 
 	static var inst : Test;
@@ -66,9 +68,6 @@ class Test {
 
 		var mc = flash.Lib.current;
 		inst = new Test(mc);
-
-		var statusPanel = new h3d.tools.StatusPanel();
-		mc.addChild( statusPanel );
 	}
 
 }
