@@ -6,6 +6,7 @@ import flash.display.BitmapData;
 import flash.geom.Rectangle;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.events.KeyboardEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.system.System;
@@ -76,7 +77,8 @@ class StatusPanel extends Sprite {
 		bmp.y = 125 + graph_h;
 		addChild( bmp );
 
-		format = new TextFormat( "__sans", 8 );
+		//format = new TextFormat( "__sans", 8 );
+		format = new TextFormat( "Arial", 8 );
 
 		graphics.beginFill( 0x222222 );
 		graphics.drawRect( 0, 0, w, h );
@@ -112,15 +114,27 @@ class StatusPanel extends Sprite {
 		tf_objects.textColor = 0xcccccc;
 		tf_objects.text = "MSHS: ";
 		addChild( tf_objects );
-
+	
+		flash.Lib.current.stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDownHandler );
+		addListener();
+	}
+	
+	function addListener() {
 		addEventListener( MouseEvent.MOUSE_DOWN, mouseDownHandler );
 		addEventListener( MouseEvent.CLICK, mouseClickHandler );
 		addEventListener( MouseEvent.MOUSE_OUT, mouseExitHandler );
 		addEventListener( MouseEvent.MOUSE_UP, mouseExitHandler );
 		addEventListener( Event.ENTER_FRAME, update );
-
 	}
-
+	
+	function removeListener() {
+		removeEventListener( MouseEvent.MOUSE_DOWN, mouseDownHandler );
+		removeEventListener( MouseEvent.CLICK, mouseClickHandler );
+		removeEventListener( MouseEvent.MOUSE_OUT, mouseExitHandler );
+		removeEventListener( MouseEvent.MOUSE_UP, mouseExitHandler );
+		removeEventListener( Event.ENTER_FRAME, update );
+	}
+	
 	function mouseClickHandler( e : MouseEvent ) {
 		handleMouseFPS();
 	}
@@ -157,7 +171,14 @@ class StatusPanel extends Sprite {
 		}
 		tf_fps.text = "FPS: " + fps + " / " + stage.frameRate;
 	}
-
+	
+	function keyDownHandler( e : KeyboardEvent ) {
+		if( e.ctrlKey && e.keyCode == 73 ) {
+			visible = !visible;
+			if( visible ) addListener() else removeListener();
+		}
+	}
+	
 	function update(_) {
 
 		timer = flash.Lib.getTimer();
