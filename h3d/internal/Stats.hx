@@ -16,6 +16,7 @@ class Stats {
 	public function new() {
 		timeLag = 0.9;
 		transformTime = 0;
+		materialTime = 0;
 		sortTime = 0;
 		drawTime = 0;
 	}
