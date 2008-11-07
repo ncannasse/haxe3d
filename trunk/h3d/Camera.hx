@@ -5,7 +5,6 @@ class Camera {
 	public var position : Vector;
 	public var target : Vector;
 	public var up : Vector;
-	public var zoom : Float;
 	
 	public var mcam : Matrix;
 	public var mproj : Matrix;
@@ -17,7 +16,6 @@ class Camera {
 		this.target = (target == null) ? new Vector(0,0,0) : target;
 		this.up = (up == null) ? new Vector(0,0,1) : up;
 		
-		zoom = 5;
 		mcam = new Matrix();
 		mproj = new Matrix();
 		m = new Matrix();
@@ -38,7 +36,6 @@ class Camera {
 	}
 
 	public function update() {
-		position.scale( zoom / position.length() );
 		// use Right-Handed
 		var az = target.sub(position);
 		az.normalize();
