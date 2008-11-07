@@ -77,89 +77,87 @@ class World {
 		var lbuf = this.lbuf;
 		var vindex = 0, tindex = 0, uvindex = 0, lindex = 0;
 		for( o in objects ) {
-			if( o.matchLOD( camera ) ) {
-				// precalculate the absolute projection matrix
-				// by taking the object position into account
-				m.multiply3x4_4x4(o.position,camera.m);
-				for( pinst in o.primitives ) {
-					var prim = pinst.p;
-					// project all points and store 'w' for later usage
-					var p = prim.points;
-					while( p != null ) {
-						var pw = 1.0 / (m._14 * p.x + m._24 * p.y + m._34 * p.z + m._44);
-						p.sx = (m._11 * p.x + m._21 * p.y + m._31 * p.z + m._41) * pw;
-						p.sy = (m._12 * p.x + m._22 * p.y + m._32 * p.z + m._42) * pw;
-						p.w = pw;
-						p = p.next;
+			// precalculate the absolute projection matrix
+			// by taking the object position into account
+			m.multiply3x4_4x4(o.position,camera.m);
+			for( pinst in o.primitives ) {
+				var prim = pinst.p;
+				// project all points and store 'w' for later usage
+				var p = prim.points;
+				while( p != null ) {
+					var pw = 1.0 / (m._14 * p.x + m._24 * p.y + m._34 * p.z + m._44);
+					p.sx = (m._11 * p.x + m._21 * p.y + m._31 * p.z + m._41) * pw;
+					p.sy = (m._12 * p.x + m._22 * p.y + m._32 * p.z + m._42) * pw;
+					p.w = pw;
+					p = p.next;
+				}
+				// calculate all triangles-z
+				var t = prim.triangles;
+				var vbase = vindex >> 1;
+				while( t != null ) {
+					tbuf[tindex++] = t;
+					// the triangle.z is the average of the three vertexes
+					t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
+					t.ibase = vbase;
+					t = t.next;
+				}
+				// emit vertexes into buffer
+				var v = prim.vertexes;
+				while( v != null ) {
+					vbuf[vindex++] = v.p.sx;
+					vbuf[vindex++] = v.p.sy;
+					uvbuf[uvindex++] = v.u;
+					uvbuf[uvindex++] = v.v;
+					uvbuf[uvindex++] = v.p.w;
+					v = v.next;
+				}
+				// calculate the light position in terms of object coordinates
+				m.inverse3x4(o.position);
+				var lx = light.x * m._11 + light.y * m._21 + light.z * m._31;
+				var ly = light.x * m._12 + light.y * m._22 + light.z * m._32;
+				var lz = light.x * m._13 + light.y * m._23 + light.z * m._33;
+				// ... normalize it in case we have a scale in the object matrix
+				var len = 1.0 / Math.sqrt(lx * lx + ly * ly + lz * lz);
+				lx *= len;
+				ly *= len;
+				lz *= len;
+				// perform shading
+				switch( prim.material.shade ) {
+				case NoLight:
+					// set all normals to maximum luminance
+					var n = prim.normals;
+					while( n != null ) {
+						n.lum = 1.0;
+						n = n.next;
 					}
-					// calculate all triangles-z
-					var t = prim.triangles;
-					var vbase = vindex >> 1;
+				case Flat:
+					// calculate face-normal luminance
+					t = prim.triangles;
 					while( t != null ) {
-						tbuf[tindex++] = t;
-						// the triangle.z is the average of the three vertexes
-						t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
-						t.ibase = vbase;
+						var lum = t.n.x * lx + t.n.y * ly + t.n.z * lz;
+						t.v0.n.lum = lum;
+						t.v1.n.lum = lum;
+						t.v2.n.lum = lum;
 						t = t.next;
 					}
-					// emit vertexes into buffer
-					var v = prim.vertexes;
-					while( v != null ) {
-						vbuf[vindex++] = v.p.sx;
-						vbuf[vindex++] = v.p.sy;
-						uvbuf[uvindex++] = v.u;
-						uvbuf[uvindex++] = v.v;
-						uvbuf[uvindex++] = v.p.w;
-						v = v.next;
+				case Gouraud:
+					// calculate normals luminance
+					var n = prim.normals;
+					while( n != null ) {
+						n.lum = n.x * lx + n.y * ly + n.z * lz;
+						n = n.next;
 					}
-					// calculate the light position in terms of object coordinates
-					m.inverse3x4(o.position);
-					var lx = light.x * m._11 + light.y * m._21 + light.z * m._31;
-					var ly = light.x * m._12 + light.y * m._22 + light.z * m._32;
-					var lz = light.x * m._13 + light.y * m._23 + light.z * m._33;
-					// ... normalize it in case we have a scale in the object matrix
-					var len = 1.0 / Math.sqrt(lx * lx + ly * ly + lz * lz);
-					lx *= len;
-					ly *= len;
-					lz *= len;
-					// perform shading
-					switch( prim.material.shade ) {
-					case NoLight:
-						// set all normals to maximum luminance
-						var n = prim.normals;
-						while( n != null ) {
-							n.lum = 1.0;
-							n = n.next;
-						}
-					case Flat:
-						// calculate face-normal luminance
-						t = prim.triangles;
-						while( t != null ) {
-							var lum = t.n.x * lx + t.n.y * ly + t.n.z * lz;
-							t.v0.n.lum = lum;
-							t.v1.n.lum = lum;
-							t.v2.n.lum = lum;
-							t = t.next;
-						}
-					case Gouraud:
-						// calculate normals luminance
-						var n = prim.normals;
-						while( n != null ) {
-							n.lum = n.x * lx + n.y * ly + n.z * lz;
-							n = n.next;
-						}
-					}
-					// write luminance to output buffer
-					v = prim.vertexes;
-					while( v != null ) {
-						lbuf[lindex++] = v.n.lum;
-						lbuf[lindex++] = 0;
-						v = v.next;
-					}
-					stats.primitives++;
 				}
-				stats.objects++;
+				// write luminance to output buffer
+				v = prim.vertexes;
+				while( v != null ) {
+					lbuf[lindex++] = v.n.lum;
+					lbuf[lindex++] = 0;
+					v = v.next;
+				}
+				stats.primitives++;
 			}
+			stats.objects++;
 		}
 		stats.triangles = tindex;
 		var dt = flash.Lib.getTimer() - t;
