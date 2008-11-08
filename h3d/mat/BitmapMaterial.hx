@@ -25,11 +25,11 @@ class BitmapMaterial extends Material {
 	override function draw( display : h3d.Display, ibuf, vbuf, lbuf, uvbuf  ) {
 		if( bmp == null )
 			update();
-		var g = display.gcolor;
+		var g = display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmp,null,false,false);
 		g.drawTriangles(vbuf,ibuf,lbuf,h3d.Const.CULLING);
 		g.endFill();
-		g = display.gbitmap;
+		g = display.getContext(flash.display.BlendMode.MULTIPLY);
 		g.beginBitmapFill(texture.bitmap,null,false,false);
 		g.drawTriangles(vbuf,ibuf,uvbuf,h3d.Const.CULLING);
 		g.endFill();

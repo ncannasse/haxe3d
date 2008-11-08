@@ -32,10 +32,6 @@ class World {
 		objects.add(o);
 	}
 
-	function zsort( t1 : h3d.internal.Triangle, t2 : h3d.internal.Triangle ) {
-		return ( t1.z > t2.z ) ? -1 : 1;
-	}
-
 	function quicksort( lo : Int, hi : Int ) : Void {
 		var i = lo;
 		var j = hi;
@@ -203,7 +199,7 @@ class World {
 		// draw axis
 		if( axisSize != 0 ) {
 			var pt = new Vector();
-			var ghud = display.ghud;
+			var ghud = display.getContext(flash.display.BlendMode.NORMAL);
 
 			ghud.lineStyle(1,0xFF0000);
 			camera.m.project(camera.target.add(new Vector(axisSize,0,0)),pt);
@@ -227,6 +223,7 @@ class World {
 
 		dt = flash.Lib.getTimer() - t;
 		stats.drawTime = stats.drawTime * stats.timeLag + (1 - stats.timeLag) * dt;
+		stats.shapeCount = display.shapeCount();
 		t += dt;
 	}
 

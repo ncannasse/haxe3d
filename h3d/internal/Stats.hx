@@ -6,6 +6,7 @@ class Stats {
 	public var primitives : Int;
 	public var triangles : Int;
 	public var drawCalls : Int;
+	public var shapeCount : Int;
 
 	public var transformTime : Float;
 	public var sortTime : Float;
@@ -27,6 +28,7 @@ class Stats {
 			primitives : primitives,
 			triangles : triangles,
 			drawCalls : drawCalls,
+			shapeCount : shapeCount,
 			transform : h3d.Const.f(transformTime),
 			sort : h3d.Const.f(sortTime),
 			material : h3d.Const.f(materialTime),
