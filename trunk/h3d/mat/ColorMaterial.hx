@@ -25,21 +25,14 @@ class ColorMaterial extends Material {
 	override function draw( display : h3d.Display, ibuf, vbuf, lbuf, uvbuf  ) {
 		if( bmp == null )
 			update();
-		var g = display.gcolor;
+		var g = display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmp,null,false,false);
 		g.drawTriangles(vbuf,ibuf,lbuf,h3d.Const.CULLING);
 		g.endFill();
-		// we need to draw on the bitmap layer as well
-		// since we don't want part of our color layer
-		// to be masked with a triangle of the bitmap layer
-		// that would have otherwise been overwritten...
+	}
 
-		// we might use this step for performing additional lightning as well
-		// such as specular
-		var g = display.gbitmap;
-		g.beginFill(0xFFFFFF);
-		g.drawTriangles(vbuf,ibuf,null,h3d.Const.CULLING);
-		g.endFill();
+	public function toString() {
+		return "[ColorMaterial "+StringTools.hex(ambient.argb,8)+":"+StringTools.hex(diffuse.argb,8)+"]";
 	}
 
 }
