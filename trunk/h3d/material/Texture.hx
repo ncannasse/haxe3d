@@ -1,4 +1,4 @@
-package h3d.mat;
+package h3d.material;
 
 class Texture {
 

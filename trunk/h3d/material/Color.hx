@@ -1,4 +1,4 @@
-package h3d.mat;
+package h3d.material;
 
 class Color {
 
@@ -14,6 +14,18 @@ class Color {
 		this.b = b;
 		this.a = a;
 		argb = Std.int(a * 255.0) << 24 | Std.int(r * 255.0) << 16 | Std.int(g * 255.0) << 8 | Std.int(b * 255.0);
+	}
+
+	public function add( c : Color ) {
+		var r = r + c.r;
+		var g = g + c.g;
+		var b = b + c.b;
+		var a = a + c.a;
+		if( r > 1 ) r = 1;
+		if( g > 1 ) g = 1;
+		if( b > 1 ) b = 1;
+		if( a > 1 ) a = 1;
+		return new Color(r,g,b,a);
 	}
 
 	public function toString() {

@@ -14,7 +14,7 @@ class Loader {
 		queue.push({ url : url, bytes : bytes, callb : callb });
 	}
 
-	public function loadTexture( file : String, t : h3d.mat.Texture ) {
+	public function loadTexture( file : String, t : h3d.material.Texture ) {
 		var me = this;
 		add(file,false,function(obj) {
 			var bdata = flash.Lib.as(obj,flash.display.Bitmap);

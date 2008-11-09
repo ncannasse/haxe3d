@@ -6,7 +6,7 @@ class PrimTmpData {
 	public var hvertexes : flash.Vector<Array<Int>>;
 	public var points : flash.Vector<Point>;
 	public var normals : flash.Vector<Normal>;
-	public var tcoords : flash.Vector<h3d.mat.UV>;
+	public var tcoords : flash.Vector<h3d.material.UV>;
 	public var v0 : h3d.Vector;
 
 	public function new( ntcoords ) {

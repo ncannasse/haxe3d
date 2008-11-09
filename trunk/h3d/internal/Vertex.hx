@@ -8,7 +8,7 @@ class Vertex {
 	public var v : Float;
 	public var next : Vertex;
 
-	public function new( p, n, t : h3d.mat.UV ) {
+	public function new( p, n, t : h3d.material.UV ) {
 		this.p = p;
 		this.n = n;
 		this.u = t.u;

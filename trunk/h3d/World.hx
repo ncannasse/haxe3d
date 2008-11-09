@@ -32,6 +32,10 @@ class World {
 		objects.add(o);
 	}
 
+	public function listObjects() {
+		return objects.iterator();
+	}
+
 	function quicksort( lo : Int, hi : Int ) : Void {
 		var i = lo;
 		var j = hi;

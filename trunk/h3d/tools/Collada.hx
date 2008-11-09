@@ -2,8 +2,8 @@ package h3d.tools;
 
 class Collada {
 
-	public var materials : Hash<h3d.mat.Material>;
-	public var textures : Hash<{ file : String, texture : h3d.mat.Texture }>;
+	public var materials : Hash<h3d.material.Material>;
+	public var textures : Hash<{ file : String, texture : h3d.material.Texture }>;
 	public var objects : Hash<h3d.Object>;
 
 	public function new() {
@@ -15,7 +15,7 @@ class Collada {
 	function parseColor( s : String ) {
 		var a = s.split(" ");
 		if( a.length != 4 ) throw "Invalid color '"+s+"'";
-		return new h3d.mat.Color(
+		return new h3d.material.Color(
 			Std.parseFloat(a[0]),
 			Std.parseFloat(a[1]),
 			Std.parseFloat(a[2]),
@@ -60,7 +60,7 @@ class Collada {
 		// load textures
 		for( i in x.node.library_images.nodes.image ) {
 			var file = i.node.init_from.innerData;
-			textures.set(i.att.id,{ file : file, texture : new h3d.mat.Texture() });
+			textures.set(i.att.id,{ file : file, texture : new h3d.material.Texture() });
 		}
 		// load material effects
 		var matfx = new Hash();
@@ -85,10 +85,10 @@ class Collada {
 			var mat = if( dif.hasNode.texture ) {
 				var sampler = dif.node.texture.att.texture;
 				var img = resolve(resolve(sampler,params),params);
-				new h3d.mat.BitmapMaterial(ambient,resolve(img,textures).texture);
+				new h3d.material.BitmapMaterial(ambient,resolve(img,textures).texture);
 			} else if( dif.hasNode.color ) {
 				var col = parseColor(dif.node.color.innerData);
-				new h3d.mat.ColorMaterial(ambient,col);
+				new h3d.material.ColorMaterial(ambient,col);
 			} else
 				throw "Unknown diffuse parameters for effect "+e.att.id;
 			matfx.set("#"+e.att.id,mat);
@@ -141,7 +141,7 @@ class Collada {
 					var max = tdata.length >> 1;
 					tinf = new flash.Vector(max,true);
 					for( p in 0...max )
-						tinf[p] = new h3d.mat.UV(tdata[i++],tdata[i++]);
+						tinf[p] = new h3d.material.UV(tdata[i++],tdata[i++]);
 					toffset = off;
 				default: // SKIP
 				}

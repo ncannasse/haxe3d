@@ -4,7 +4,7 @@ class Const {
 
 	public static inline var EPSILON = 1e-10;
 	public static inline var CULLING : flash.display.TriangleCulling = cast "positive";
-	public static var DEFAULT_SHADE_MODEL = h3d.mat.ShadeModel.Gouraud;
+	public static var DEFAULT_SHADE_MODEL = h3d.material.ShadeModel.Gouraud;
 
 	// round to 4 significant digits, eliminates <1e-10
 	public static function f( v : Float ) {
