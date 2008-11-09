@@ -12,14 +12,15 @@
         <file path="h3d\internal\Triangle.hx" />
         <file path="h3d\internal\Vertex.hx" />
       </dir>
-      <dir path="mat">
-        <file path="h3d\mat\BitmapMaterial.hx" />
-        <file path="h3d\mat\Color.hx" />
-        <file path="h3d\mat\ColorMaterial.hx" />
-        <file path="h3d\mat\Material.hx" />
-        <file path="h3d\mat\ShadeModel.hx" />
-        <file path="h3d\mat\Texture.hx" />
-        <file path="h3d\mat\UV.hx" />
+      <dir path="material">
+        <file path="h3d\material\BitmapMaterial.hx" />
+        <file path="h3d\material\Color.hx" />
+        <file path="h3d\material\ColorMaterial.hx" />
+        <file path="h3d\material\Material.hx" />
+        <file path="h3d\material\ShadeModel.hx" />
+        <file path="h3d\material\Texture.hx" />
+        <file path="h3d\material\UV.hx" />
+        <file path="h3d\material\WireMaterial.hx" />
       </dir>
       <dir path="prim">
         <file path="h3d\prim\Primitive.hx" />

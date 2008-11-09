@@ -7,17 +7,17 @@ class Primitive {
 	public var normals : h3d.internal.Normal;
 	public var vertexes : h3d.internal.Vertex;
 	public var triangles : h3d.internal.Triangle;
-	public var material : h3d.mat.Material;
+	public var material(default,null) : h3d.material.Material;
 
 	var tmpData : h3d.internal.PrimTmpData;
 
 	public function new() {
 	}
 
-	public function setDatas( points : flash.Vector<h3d.Vector>, normals : flash.Vector<h3d.Vector>, ?tcoords : flash.Vector<h3d.mat.UV> ) {
+	public function setDatas( points : flash.Vector<h3d.Vector>, normals : flash.Vector<h3d.Vector>, ?tcoords : flash.Vector<h3d.material.UV> ) {
 		if( tcoords == null ) {
 			tcoords = new flash.Vector();
-			tcoords[0] = new h3d.mat.UV(0,0);
+			tcoords[0] = new h3d.material.UV(0,0);
 		}
 		var t = new h3d.internal.PrimTmpData(tcoords.length);
 		var i = 0;
@@ -33,6 +33,11 @@ class Primitive {
 
 	public inline function setMaterial( m ) {
 		this.material = m;
+		var t = triangles;
+		while( t != null ) {
+			t.material = m;
+			t = t.next;
+		}
 	}
 
 	function makeVertex( v, n, t ) : Int {
