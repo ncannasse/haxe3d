@@ -22,12 +22,12 @@ class ColorMaterial extends Material {
 		if( bmp != null ) bmp.dispose();
 	}
 
-	override function draw( display : h3d.Display, ibuf, vbuf, lbuf, uvbuf  ) {
+	override function draw( r : h3d.internal.RenderInfos ) {
 		if( bmp == null )
 			update();
-		var g = display.getContext(flash.display.BlendMode.NORMAL);
+		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmp,null,false,false);
-		g.drawTriangles(vbuf,ibuf,lbuf,h3d.Const.CULLING);
+		g.drawTriangles(r.vertexes,r.indexes,r.lightning,r.cull);
 		g.endFill();
 	}
 

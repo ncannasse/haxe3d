@@ -9,10 +9,10 @@ class WireMaterial extends Material {
 		this.color = color;
 	}
 
-	override function draw( display : h3d.Display, ibuf : flash.Vector<Int>, vbuf : flash.Vector<Float>, lbuf : flash.Vector<Float>, uvbuf : flash.Vector<Float> ) {
-		var g = display.getContext(flash.display.BlendMode.NORMAL);
+	override function draw( r : h3d.internal.RenderInfos ) {
+		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.lineStyle(1,color.argb,color.a);
-		g.drawTriangles(vbuf,ibuf,null,flash.display.TriangleCulling.NONE);
+		g.drawTriangles(r.vertexes,r.indexes,null,r.cull_no);
 		g.lineStyle();
 	}
 

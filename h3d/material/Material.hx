@@ -33,7 +33,7 @@ class Material {
 		// TO OVERRIDE
 	}
 
-	public function draw( display : h3d.Display, ibuf : flash.Vector<Int>, vbuf : flash.Vector<Float>, lbuf : flash.Vector<Float>, uvbuf : flash.Vector<Float> ) {
+	public function draw( r : h3d.internal.RenderInfos ) {
 		// TO OVERRIDE
 	}
 
