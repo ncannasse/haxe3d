@@ -27,11 +27,11 @@ class BitmapMaterial extends Material {
 			update();
 		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmp,null,false,false);
-		g.drawTriangles(r.vertexes,r.indexes,r.lightning,r.cull);
+		g.drawTriangles(r.vertexes,r.indexes,r.lightning);
 		g.endFill();
 		g = r.display.getContext(flash.display.BlendMode.MULTIPLY);
 		g.beginBitmapFill(texture.bitmap,null,false,false);
-		g.drawTriangles(r.vertexes,r.indexes,r.uvcoords,r.cull);
+		g.drawTriangles(r.vertexes,r.indexes,r.uvcoords);
 		g.endFill();
 	}
 

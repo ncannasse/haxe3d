@@ -218,8 +218,7 @@ class StatusPanel extends Sprite {
 
 		s += "\nT&L: "+stats.transformTime;
 		s += "\nSRT:  "+stats.sortTime;
-		s += "\nMAT: "+stats.materialTime;
-		s += "\nDRW: "+stats.drawTime;
+		s += "\nDRW: "+(stats.materialTime+stats.drawTime);
 
 		tf_objects.text = s;
 	}

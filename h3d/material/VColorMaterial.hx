@@ -33,11 +33,11 @@ class VColorMaterial extends Material {
 	override function draw( r : h3d.internal.RenderInfos ) {
 		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmpR,null,false,false);
-		g.drawTriangles(r.vertexes,r.indexes,r.lightning,r.cull);
+		g.drawTriangles(r.vertexes,r.indexes,r.lightning);
 		g.endFill();
 		g = r.display.getContext(flash.display.BlendMode.ADD);
 		g.beginBitmapFill(bmpGB,null,false,false);
-		g.drawTriangles(r.vertexes,r.indexes,r.colors,r.cull);
+		g.drawTriangles(r.vertexes,r.indexes,r.colors);
 		g.endFill();
 	}
 
