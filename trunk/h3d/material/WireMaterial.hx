@@ -12,7 +12,7 @@ class WireMaterial extends Material {
 	override function draw( r : h3d.internal.RenderInfos ) {
 		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.lineStyle(1,color.argb,color.a);
-		g.drawTriangles(r.vertexes,r.indexes,null,r.cull_no);
+		g.drawTriangles(r.vertexes,r.indexes,null);
 		g.lineStyle();
 	}
 

@@ -127,8 +127,8 @@ class World {
 		// render triangles to vbuf and tbuf
 		var t = flash.Lib.getTimer();
 		var m = new h3d.Matrix();
+		r.triangles = new flash.Vector();
 		var vbuf = r.vertexes;
-		var zbuf = r.zcoords;
 		var tbuf = r.triangles;
 		var uvbuf = r.uvcoords;
 		var lbuf = r.lightning;
@@ -153,10 +153,18 @@ class World {
 				var t = prim.triangles;
 				var vbase = vindex >> 1;
 				while( t != null ) {
-					tbuf[tindex++] = t;
-					// the triangle.z is the average of the three vertexes
-					t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
-					t.ibase = vbase;
+					var p1 = t.v1.p;
+					var va1 = t.v0.p.sx - p1.sx;
+					var vb1 = t.v0.p.sy - p1.sy;
+					var va2 = t.v2.p.sx - p1.sx;
+					var vb2 = t.v2.p.sy - p1.sy;
+					// culling
+					if( va2*vb1-va1*vb2 < 0 ) {
+						tbuf[tindex++] = t;
+						// the triangle.z is the average of the three vertexes
+						t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
+						t.ibase = vbase;
+					}
 					t = t.next;
 				}
 				// emit vertexes into buffer

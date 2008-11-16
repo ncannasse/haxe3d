@@ -3,6 +3,7 @@
 	added points lights
 	added VertexColor shading mode and VColor material
 	added world.drawPoint and .drawLine
+	perform backface culling
 	
 2008-11-09
 	use dynamic shape allocation (single draw for color materials)
