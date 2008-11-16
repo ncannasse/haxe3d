@@ -5,23 +5,41 @@ class World {
 	public var camera : h3d.Camera;
 	public var display : h3d.Display;
 	public var axisSize : Float;
-	public var light : h3d.Vector;
 	public var stats : h3d.internal.Stats;
+	var plights : haxe.FastList<h3d.internal.LightInst>;
+	var dlights : haxe.FastList<h3d.internal.LightInst>;
 	var objects : haxe.FastList<h3d.Object>;
 	var r : h3d.internal.RenderInfos;
 
 	public function new( display, camera ) {
 		this.camera = camera;
 		this.display = display;
-		this.axisSize = 0;
-		this.objects = new haxe.FastList<h3d.Object>();
+		axisSize = 0;
+		objects = new haxe.FastList<h3d.Object>();
+		plights = new haxe.FastList<h3d.internal.LightInst>();
+		dlights = new haxe.FastList<h3d.internal.LightInst>();
 		stats = new h3d.internal.Stats();
-		light = new h3d.Vector(0,0,-1);
 		r = new h3d.internal.RenderInfos(display);
 	}
 
 	public function addObject( o ) {
 		objects.add(o);
+	}
+
+	public function addLight( l : h3d.material.Light ) {
+		(if( l.directional ) dlights else plights).add(new h3d.internal.LightInst(l));
+	}
+
+	public function removeObject( o ) {
+		return objects.remove(o);
+	}
+
+	public function removeLight( l : h3d.material.Light ) {
+		var lights = l.directional?dlights:plights;
+		for( l2 in lights )
+			if( l2.l == l )
+				return lights.remove(l2);
+		return false;
 	}
 
 	public function listObjects() {
@@ -46,18 +64,65 @@ class World {
 		if( i < hi ) quicksort( i, hi );
 	}
 
+	function updateLights( m : Matrix, pos : Matrix ) {
+		m.inverse3x4(pos);
+		var Math = Math;
+		for( l in dlights ) {
+			// calculate the light position in terms of object coordinates
+			var p = l.pos;
+			var lx = p.x * m._11 + p.y * m._21 + p.z * m._31;
+			var ly = p.x * m._12 + p.y * m._22 + p.z * m._32;
+			var lz = p.x * m._13 + p.y * m._23 + p.z * m._33;
+			// ... normalize it in case we have a scale in the object matrix
+			var k = l.l.power / Math.sqrt(lx * lx + ly * ly + lz * lz);
+			l.lx = lx * k;
+			l.ly = ly * k;
+			l.lz = lz * k;
+		}
+		for( l in plights ) {
+			// calculate the light position in terms of object coordinates
+			var p = l.pos;
+			l.lx = p.x * m._11 + p.y * m._21 + p.z * m._31;
+			l.ly = p.x * m._12 + p.y * m._22 + p.z * m._32;
+			l.lz = p.x * m._13 + p.y * m._23 + p.z * m._33;
+		}
+	}
+
 	public function render() {
-		var stats = stats;
+		beginRender();
+		renderObjects();
+		finishRender();
+	}
+
+	public function beginRender() {
 		stats.objects = 0;
 		stats.primitives = 0;
 		stats.triangles = 0;
 		stats.drawCalls = 0;
 		display.beginDraw();
+		// prepare lights
+		for( l in dlights ) {
+			var p = l.pos;
+			p.x = -l.l.position.x;
+			p.y = -l.l.position.y;
+			p.z = -l.l.position.z;
+			l.r = l.l.color.r;
+			l.g = l.l.color.g;
+			l.b = l.l.color.b;
+		}
+		for( l in plights ) {
+			var p = l.pos;
+			p.x = l.l.position.x;
+			p.y = l.l.position.y;
+			p.z = l.l.position.z;
+			l.r = l.l.color.r * l.l.power;
+			l.g = l.l.color.g * l.l.power;
+			l.b = l.l.color.b * l.l.power;
+		}
+	}
 
-		// prepare light
-		var light = light.copy();
-		light.normalize();
-		light.scale(-1);
+	public function renderObjects() {
+		var stats = stats;
 
 		// render triangles to vbuf and tbuf
 		var t = flash.Lib.getTimer();
@@ -104,49 +169,166 @@ class World {
 					uvbuf[uvindex++] = v.p.w;
 					v = v.next;
 				}
-				// calculate the light position in terms of object coordinates
-				m.inverse3x4(o.position);
-				var lx = light.x * m._11 + light.y * m._21 + light.z * m._31;
-				var ly = light.x * m._12 + light.y * m._22 + light.z * m._32;
-				var lz = light.x * m._13 + light.y * m._23 + light.z * m._33;
-				// ... normalize it in case we have a scale in the object matrix
-				var len = 1.0 / Math.sqrt(lx * lx + ly * ly + lz * lz);
-				lx *= len;
-				ly *= len;
-				lz *= len;
 				// perform shading
 				switch( prim.material.shade ) {
 				case NoLight:
-					// set all normals to maximum luminance
-					var n = prim.normals;
-					while( n != null ) {
-						n.lum = 1.0;
-						n = n.next;
+					// set all luminance to maximum value
+					v = prim.vertexes;
+					while( v != null ) {
+						lbuf[lindex++] = 1.0;
+						lbuf[lindex++] = 0;
+						lbuf[lindex++] = 0;
+						v = v.next;
 					}
 				case Flat:
+					updateLights(m,o.position);
+					// reset normals luminance
+					var n = prim.normals;
+					while( n != null ) {
+						n.lum = 0;
+						n = n.next;
+					}
 					// calculate face-normal luminance
-					t = prim.triangles;
-					while( t != null ) {
-						var lum = t.n.x * lx + t.n.y * ly + t.n.z * lz;
-						t.v0.n.lum = lum;
-						t.v1.n.lum = lum;
-						t.v2.n.lum = lum;
-						t = t.next;
+					for( l in dlights ) {
+						t = prim.triangles;
+						while( t != null ) {
+							var lum = t.n.x * l.lx + t.n.y * l.ly + t.n.z * l.lz;
+							t.v0.n.lum += lum;
+							t.v1.n.lum += lum;
+							t.v2.n.lum += lum;
+							t = t.next;
+						}
+					}
+					// write luminance to output buffer
+					v = prim.vertexes;
+					while( v != null ) {
+						lbuf[lindex++] = v.n.lum;
+						lbuf[lindex++] = 0;
+						lbuf[lindex++] = v.p.w;
+						v = v.next;
 					}
 				case Gouraud:
+					updateLights(m,o.position);
 					// calculate normals luminance
 					var n = prim.normals;
 					while( n != null ) {
-						n.lum = n.x * lx + n.y * ly + n.z * lz;
+						n.lum = 0;
 						n = n.next;
 					}
-				}
-				// write luminance to output buffer
-				v = prim.vertexes;
-				while( v != null ) {
-					lbuf[lindex++] = v.n.lum;
-					lbuf[lindex++] = 0;
-					v = v.next;
+					for( l in dlights ) {
+						n = prim.normals;
+						while( n != null ) {
+							n.lum += n.x * l.lx + n.y * l.ly + n.z * l.lz;
+							n = n.next;
+						}
+					}
+					// add point-lights color
+					if( prim.material.pointLights ) {
+						v = prim.vertexes;
+						while( v != null ) {
+							v.lum = v.n.lum;
+							v = v.next;
+						}
+						for( l in plights ) {
+							v = prim.vertexes;
+							while( v != null ) {
+								var dx = l.lx - v.p.x;
+								var dy = l.ly - v.p.y;
+								var dz = l.lz - v.p.z;
+								v.lum += (v.n.x * dx + v.n.y * dy + v.n.z * dz) * l.l.power / (dx * dx + dy * dy + dz * dz);
+								v = v.next;
+							}
+						}
+						// write luminance to output buffer
+						v = prim.vertexes;
+						while( v != null ) {
+							lbuf[lindex++] = v.lum;
+							lbuf[lindex++] = 0;
+							lbuf[lindex++] = v.p.w;
+							v = v.next;
+						}
+					} else {
+						// write luminance to output buffer
+						v = prim.vertexes;
+						while( v != null ) {
+							lbuf[lindex++] = v.n.lum;
+							lbuf[lindex++] = 0;
+							lbuf[lindex++] = v.p.w;
+							v = v.next;
+						}
+					}
+				case VertexColor:
+					updateLights(m,o.position);
+					// calculate normals luminance
+					var n = prim.normals;
+					while( n != null ) {
+						n.r = 0;
+						n.g = 0;
+						n.b = 0;
+						n = n.next;
+					}
+					for( l in dlights ) {
+						n = prim.normals;
+						while( n != null ) {
+							var lum = n.x * l.lx + n.y * l.ly + n.z * l.lz;
+							n.r += lum * l.r;
+							n.g += lum * l.g;
+							n.b += lum * l.b;
+							n = n.next;
+						}
+					}
+					// pad the color buffer with zeroes
+					while( cindex < lindex ) {
+						cbuf[cindex++] = 0;
+						cbuf[cindex++] = 0;
+						cbuf[cindex++] = 0;
+					}
+					// add point-lights color
+					if( prim.material.pointLights ) {
+						v = prim.vertexes;
+						while( v != null ) {
+							v.r = v.n.r;
+							v.g = v.n.g;
+							v.b = v.n.b;
+							v = v.next;
+						}
+						for( l in plights ) {
+							v = prim.vertexes;
+							while( v != null ) {
+								var dx = l.lx - v.p.x;
+								var dy = l.ly - v.p.y;
+								var dz = l.lz - v.p.z;
+								var lum = (v.n.x * dx + v.n.y * dy + v.n.z * dz) / (dx * dx + dy * dy + dz * dz);
+								v.r += lum * l.r;
+								v.g += lum * l.g;
+								v.b += lum * l.b;
+								v = v.next;
+							}
+						}
+						// write luminance and color to output buffer
+						v = prim.vertexes;
+						while( v != null ) {
+							lbuf[lindex++] = v.r + v.cr;
+							lbuf[lindex++] = 0;
+							lbuf[lindex++] = v.p.w;
+							cbuf[cindex++] = v.g + v.cg;
+							cbuf[cindex++] = v.b + v.cb;
+							cbuf[cindex++] = v.p.w;
+							v = v.next;
+						}
+					} else {
+						// write luminance and color to output buffer
+						v = prim.vertexes;
+						while( v != null ) {
+							lbuf[lindex++] = v.n.r + v.cr;
+							lbuf[lindex++] = 0;
+							lbuf[lindex++] = v.p.w;
+							cbuf[cindex++] = v.n.g + v.cg;
+							cbuf[cindex++] = v.n.b + v.cb;
+							cbuf[cindex++] = v.p.w;
+							v = v.next;
+						}
+					}
 				}
 				stats.primitives++;
 			}
@@ -171,7 +353,6 @@ class World {
 			var ibuf = new flash.Vector<Int>();
 			var iindex = 0;
 			var mat = tbuf[0].material;
-			var cull = flash.display.TriangleCulling.POSITIVE;
 			while( tindex < max ) {
 				var t = tbuf[tindex++];
 				if( t.material != mat ) {
@@ -194,36 +375,50 @@ class World {
 			stats.materialTime = stats.materialTime * stats.timeLag + (1 - stats.timeLag) * dt;
 			t += dt;
 		}
+	}
 
+	public function finishRender() {
 		// draw axis
 		if( axisSize != 0 ) {
-			var pt = new Vector();
-			var ghud = display.getContext(flash.display.BlendMode.NORMAL);
-
-			ghud.lineStyle(1,0xFF0000);
-			camera.m.project(camera.target.add(new Vector(axisSize,0,0)),pt);
-			ghud.moveTo(0,0);
-			ghud.lineTo(pt.x,pt.y);
-
-			ghud.lineStyle(1,0x00FF00);
-			camera.m.project(camera.target.add(new Vector(0,axisSize,0)),pt);
-			ghud.moveTo(0,0);
-			ghud.lineTo(pt.x,pt.y);
-
-			ghud.lineStyle(1,0x0000FF);
-			camera.m.project(camera.target.add(new Vector(0,0,axisSize)),pt);
-			ghud.moveTo(0,0);
-			ghud.lineTo(pt.x,pt.y);
-
-			ghud.lineStyle();
+			var p0 = new Vector();
+			drawLine(p0,new Vector(axisSize,0,0),new h3d.material.Color(1,0,0));
+			drawLine(p0,new Vector(0,axisSize,0),new h3d.material.Color(0,1,0));
+			drawLine(p0,new Vector(0,0,axisSize),new h3d.material.Color(0,0,1));
 		}
-
+		var t = flash.Lib.getTimer();
 		display.endDraw();
-
-		dt = flash.Lib.getTimer() - t;
+		var dt = flash.Lib.getTimer() - t;
 		stats.drawTime = stats.drawTime * stats.timeLag + (1 - stats.timeLag) * dt;
 		stats.shapeCount = display.shapeCount();
-		t += dt;
+	}
+
+	public function drawPoint( p : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
+		var pt = new Vector();
+		var g = display.getContext(flash.display.BlendMode.NORMAL);
+		pt.x = camera.target.x + p.x;
+		pt.y = camera.target.y + p.y;
+		pt.z = camera.target.x + p.z;
+		camera.m.project(pt,pt);
+		g.beginFill(color.argb,color.a);
+		g.drawCircle(pt.x,pt.y,size);
+		g.endFill();
+	}
+
+	public function drawLine( p : h3d.Vector, p2 : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
+		var pt = new Vector();
+		var g = display.getContext(flash.display.BlendMode.NORMAL);
+		g.lineStyle(size,color.argb,color.a);
+		pt.x = camera.target.x + p.x;
+		pt.y = camera.target.y + p.y;
+		pt.z = camera.target.x + p.z;
+		camera.m.project(pt,pt);
+		g.moveTo(pt.x,pt.y);
+		pt.x = camera.target.x + p2.x;
+		pt.y = camera.target.y + p2.y;
+		pt.z = camera.target.x + p2.z;
+		camera.m.project(pt,pt);
+		g.lineTo(pt.x,pt.y);
+		g.lineStyle();
 	}
 
 }

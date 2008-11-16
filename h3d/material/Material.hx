@@ -3,9 +3,11 @@ package h3d.material;
 class Material {
 
 	public var shade : ShadeModel;
+	public var pointLights : Bool;
 
 	function new() {
 		shade = h3d.Const.DEFAULT_SHADE_MODEL;
+		pointLights = true;
 	}
 
 	function buildAmbientDiffuseBitmap( bmp : flash.display.BitmapData, ambient : Color, diffuse : Color ) {
