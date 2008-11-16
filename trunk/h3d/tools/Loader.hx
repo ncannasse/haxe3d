@@ -51,9 +51,26 @@ class Loader {
 		var e = queue.shift();
 		cur = null;
 		bytes = null;
-		if( e == null )
+		if( e == null ) {
 			onLoaded();
-		else if( e.bytes ) {
+			return;
+		}
+		var data = haxe.Resource.getBytes(e.url);
+		if( data != null ) {
+			if( e.bytes ) {
+				e.callb(data.getData());
+				start();
+			} else {
+				cur = new flash.display.Loader();
+				cur.contentLoaderInfo.addEventListener(flash.events.Event.COMPLETE,function(_) {
+					e.callb(me.cur.content);
+					me.start();
+				});
+				cur.loadBytes(data.getData());
+			}
+			return;
+		}
+		if( e.bytes ) {
 			var me = this;
 			bytes = new flash.net.URLLoader(new flash.net.URLRequest(e.url));
 			bytes.dataFormat = flash.net.URLLoaderDataFormat.BINARY;
