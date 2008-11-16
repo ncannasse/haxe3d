@@ -1,0 +1,11 @@
+2008-11-09
+	use dynamic shape allocation (single draw for color materials)
+	added wire material
+
+2008-11-05
+	added directional lightning
+	added gouraud and flat shading
+	improved triangle sort perfs
+
+2008-11-03
+	basic rendering

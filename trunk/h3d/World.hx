@@ -8,11 +8,7 @@ class World {
 	public var light : h3d.Vector;
 	public var stats : h3d.internal.Stats;
 	var objects : haxe.FastList<h3d.Object>;
-	var vbuf : flash.Vector<Float>;
-	var zbuf : flash.Vector<Float>;
-	var uvbuf : flash.Vector<Float>;
-	var lbuf : flash.Vector<Float>;
-	var tbuf : flash.Vector<h3d.internal.Triangle>;
+	var r : h3d.internal.RenderInfos;
 
 	public function new( display, camera ) {
 		this.camera = camera;
@@ -21,11 +17,7 @@ class World {
 		this.objects = new haxe.FastList<h3d.Object>();
 		stats = new h3d.internal.Stats();
 		light = new h3d.Vector(0,0,-1);
-		vbuf = new flash.Vector();
-		tbuf = new flash.Vector();
-		zbuf = new flash.Vector();
-		uvbuf = new flash.Vector();
-		lbuf = new flash.Vector();
+		r = new h3d.internal.RenderInfos(display);
 	}
 
 	public function addObject( o ) {
@@ -39,7 +31,7 @@ class World {
 	function quicksort( lo : Int, hi : Int ) : Void {
 		var i = lo;
 		var j = hi;
-		var tbuf = tbuf;
+		var tbuf = r.triangles;
 		var p = tbuf[(lo+hi)>>1].z;
 		while( i <= j ) {
 			while( tbuf[i].z > p ) i++;
@@ -70,12 +62,13 @@ class World {
 		// render triangles to vbuf and tbuf
 		var t = flash.Lib.getTimer();
 		var m = new h3d.Matrix();
-		var vbuf = this.vbuf;
-		var zbuf = this.zbuf;
-		var tbuf = this.tbuf;
-		var uvbuf = this.uvbuf;
-		var lbuf = this.lbuf;
-		var vindex = 0, tindex = 0, uvindex = 0, lindex = 0;
+		var vbuf = r.vertexes;
+		var zbuf = r.zcoords;
+		var tbuf = r.triangles;
+		var uvbuf = r.uvcoords;
+		var lbuf = r.lightning;
+		var cbuf = r.colors;
+		var vindex = 0, tindex = 0, uvindex = 0, lindex = 0, cindex = 0;
 		for( o in objects ) {
 			// precalculate the absolute projection matrix
 			// by taking the object position into account
@@ -183,7 +176,8 @@ class World {
 				var t = tbuf[tindex++];
 				if( t.material != mat ) {
 					stats.drawCalls++;
-					mat.draw(display,ibuf,vbuf,lbuf,uvbuf);
+					r.indexes = ibuf;
+					mat.draw(r);
 					ibuf = new flash.Vector<Int>();
 					iindex = 0;
 					mat = t.material;
@@ -193,7 +187,8 @@ class World {
 				ibuf[iindex++] = t.ibase + t.iv2;
 			}
 			stats.drawCalls++;
-			mat.draw(display,ibuf,vbuf,lbuf,uvbuf);
+			r.indexes = ibuf;
+			mat.draw(r);
 
 			dt = flash.Lib.getTimer() - t;
 			stats.materialTime = stats.materialTime * stats.timeLag + (1 - stats.timeLag) * dt;
