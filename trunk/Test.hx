@@ -4,6 +4,8 @@ class Test {
 
 	var mc : flash.display.MovieClip;
 	var world : h3d.World;
+	var light : h3d.material.Light;
+	var light2 : h3d.material.Light;
 	var cam : h3d.Camera;
 	var time : Float;
 	var collada : h3d.tools.Collada;
@@ -14,10 +16,14 @@ class Test {
 		var display = new h3d.Display(mc.stage.stageWidth,mc.stage.stageHeight);
 		mc.addChild(display.result);
 		cam = new h3d.Camera(new Vector(10,10,10));
-		czoom = 5;
+		czoom = 8;
 		time = 0;
+		light = new h3d.material.Light(new h3d.Vector(0,0,-1),new h3d.material.Color(1,0.1,0.5),false);
+		light2 = new h3d.material.Light(new h3d.Vector(0,0,2),new h3d.material.Color(0,0.5,0),false);
 		world = new h3d.World( display, cam );
 		world.axisSize = 1;
+		world.addLight(light);
+		world.addLight(light2);
 		var loader = new h3d.tools.Loader();
 		collada = loader.loadCollada("res/axisCube.dae");
 		loader.onLoaded = init;
@@ -27,19 +33,24 @@ class Test {
 	}
 
 	function init() {
-		for( o in collada.objects ) {
+		for( o in collada.objects )
 			world.addObject( o );
-		}
 		var me = this;
-		var qualities = [flash.display.StageQuality.BEST,flash.display.StageQuality.HIGH,flash.display.StageQuality.MEDIUM,flash.display.StageQuality.LOW];
-		var qpos = 3;
 		mc.addEventListener(flash.events.Event.ENTER_FRAME,function(_) inst.render());
 		mc.stage.addEventListener(flash.events.KeyboardEvent.KEY_UP,function(e:flash.events.KeyboardEvent) me.onKey(e.keyCode));
 		mc.stage.addEventListener(flash.events.MouseEvent.MOUSE_WHEEL,function(e:flash.events.MouseEvent) me.czoom *= (e.delta > 0) ? 0.85 : 1.15);
-		mc.stage.addEventListener(flash.events.MouseEvent.MOUSE_UP,function(e:flash.events.MouseEvent) {
-			me.mc.stage.quality = qualities[qpos % qualities.length];
-			qpos++;
-		});
+	}
+
+	function getColor( mat : h3d.material.Material ) {
+		var color = null;
+		var m = flash.Lib.as(mat,h3d.material.ColorMaterial);
+		if( m != null ) color = m.ambient.add(m.diffuse);
+		var m = flash.Lib.as(mat,h3d.material.BitmapMaterial);
+		if( m != null ) color = m.ambient;
+		var m = flash.Lib.as(mat,h3d.material.WireMaterial);
+		if( m != null ) color = m.color;
+		if( color == null ) color = new h3d.material.Color(0.5,0.5,0.5,1);
+		return color;
 	}
 
 	function onKey( k : Int ) {
@@ -47,17 +58,38 @@ class Test {
 		case "W".code:
 			for( o in world.listObjects() )
 				for( p in o.primitives ) {
-					var color = new h3d.material.Color(0,0,0,0.5);
-					var mat = p.p.material;
-					var m = flash.Lib.as(mat,h3d.material.ColorMaterial);
-					if( m != null ) color = m.ambient.add(m.diffuse);
-					var m = flash.Lib.as(mat,h3d.material.BitmapMaterial);
-					if( m != null ) color = m.ambient;
-					var m = flash.Lib.as(mat,h3d.material.WireMaterial);
-					if( m != null ) color = m.color;
+					var color = getColor(p.p.material);
 					p.p.material.free();
 					p.p.setMaterial(new h3d.material.WireMaterial(color));
 				}
+		case "P".code:
+			var vcolor = new h3d.material.VColorMaterial();
+			for( o in world.listObjects() )
+				for( p in o.primitives ) {
+					var color = getColor(p.p.material).scale(0.3);
+					// colorize vertexes with material color
+					var v = p.p.vertexes;
+					while( v != null ) {
+						v.cr = color.r;
+						v.cb = color.b;
+						v.cg = color.g;
+						v = v.next;
+					}
+					// set vertex color material
+					p.p.setMaterial(vcolor);
+				}
+		case "Q".code:
+			var qualities = [flash.display.StageQuality.BEST,flash.display.StageQuality.HIGH,flash.display.StageQuality.MEDIUM,flash.display.StageQuality.LOW];
+			var qpos = 0;
+			// fu*n, the enums are lowercase while reading the attribute is uppercase
+			var q = Std.string(mc.stage.quality).toLowerCase();
+			for( i in 0...qualities.length )
+				if( q == Std.string(qualities[i]).toLowerCase() ) {
+					qpos = i;
+					break;
+				}
+			qpos++;
+			mc.stage.quality = qualities[qpos % qualities.length];
 		}
 	}
 
@@ -75,11 +107,21 @@ class Test {
 
 		// rotate light direction
 		time += 0.03;
-		world.light.x = -Math.cos(time);
-		world.light.y = -Math.sin(time);
-		world.light.z = -1;
+		light.power = light.directional ? 1.0 : 2.0;
+		light.position.x = -Math.cos(time) * 3;
+		light.position.y = -Math.sin(time) * 3;
+		light.position.z = light.directional ? -3 : 3;
+		light2.position.x = -Math.cos(time/2) * 2;
+		light2.position.y = -Math.sin(time/3) * 4;
+		light2.position.z = light2.directional ? -2 : 2;
 		// render
-		world.render();
+		world.beginRender();
+		world.renderObjects();
+		if( !light.directional )
+			world.drawPoint(light.position,light.color,3);
+		if( !light2.directional )
+			world.drawPoint(light2.position,light2.color,3);
+		world.finishRender();
 	}
 
 	static var inst : Test;

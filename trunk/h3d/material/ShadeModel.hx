@@ -4,4 +4,5 @@ enum ShadeModel {
 	NoLight;
 	Flat;
 	Gouraud;
+	VertexColor;
 }

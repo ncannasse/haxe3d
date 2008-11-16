@@ -1,3 +1,9 @@
+2008-11-16
+	support for multiple lights
+	added points lights
+	added VertexColor shading mode and VColor material
+	added world.drawPoint and .drawLine
+	
 2008-11-09
 	use dynamic shape allocation (single draw for color materials)
 	added wire material

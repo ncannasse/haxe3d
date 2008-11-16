@@ -210,16 +210,16 @@ class StatusPanel extends Sprite {
 
 		var s = "";
 		var stats = world.stats;
-		s += "OBJ:  "+stats.objects;
-		s += "\nPRI: "+stats.primitives;
+		s += "OBJ: "+stats.objects;
 		s += "\nTRI: "+stats.triangles;
 		s += "\nDCL: "+stats.drawCalls;
 		s += "\nSHP: "+stats.shapeCount;
+		s += "\nQLT: "+stage.quality;
 
-		s += "\nTTI: "+stats.transformTime;
-		s += "\nSTI:  "+stats.sortTime;
-		s += "\nMTI: "+stats.materialTime;
-		s += "\nDTI: "+stats.drawTime;
+		s += "\nT&L: "+stats.transformTime;
+		s += "\nSRT:  "+stats.sortTime;
+		s += "\nMAT: "+stats.materialTime;
+		s += "\nDRW: "+stats.drawTime;
 
 		tf_objects.text = s;
 	}
