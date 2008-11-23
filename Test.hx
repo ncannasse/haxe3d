@@ -1,5 +1,7 @@
 import h3d.Vector;
 
+typedef K = flash.ui.Keyboard;
+
 class Test {
 
 	var mc : flash.display.MovieClip;
@@ -38,7 +40,6 @@ class Test {
 		var me = this;
 		mc.addEventListener(flash.events.Event.ENTER_FRAME,function(_) inst.render());
 		mc.stage.addEventListener(flash.events.KeyboardEvent.KEY_UP,function(e:flash.events.KeyboardEvent) me.onKey(e.keyCode));
-		mc.stage.addEventListener(flash.events.MouseEvent.MOUSE_WHEEL,function(e:flash.events.MouseEvent) me.czoom *= (e.delta > 0) ? 0.85 : 1.15);
 	}
 
 	function getColor( mat : h3d.material.Material ) {
@@ -90,6 +91,10 @@ class Test {
 				}
 			qpos++;
 			mc.stage.quality = qualities[qpos % qualities.length];
+		case K.DOWN:
+			czoom *= 1.15;
+		case K.UP:
+			czoom /= 1.15;
 		}
 	}
 
