@@ -28,7 +28,6 @@ class ColorMaterial extends Material {
 		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmp,null,false,false);
 		g.drawTriangles(r.vertexes,r.indexes,r.lightning);
-		g.endFill();
 	}
 
 	public function toString() {

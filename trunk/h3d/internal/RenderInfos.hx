@@ -12,10 +12,6 @@ class RenderInfos {
 
 	public function new(display) {
 		this.display = display;
-		vertexes = new flash.Vector();
-		lightning = new flash.Vector();
-		uvcoords = new flash.Vector();
-		colors = new flash.Vector();
 	}
 
 }

@@ -58,12 +58,12 @@ class Primitive {
 
 	public inline function addTriangle( v0, v1, v2, n0, n1, n2, t0, t1, t2 ) {
 		var t = new h3d.internal.Triangle();
-		t.iv0 = makeVertex(v0,n0,t0);
-		t.iv1 = makeVertex(v1,n1,t1);
-		t.iv2 = makeVertex(v2,n2,t2);
-		t.v0 = tmpData.avertexes[t.iv0];
-		t.v1 = tmpData.avertexes[t.iv1];
-		t.v2 = tmpData.avertexes[t.iv2];
+		var iv0 = makeVertex(v0,n0,t0);
+		var iv1 = makeVertex(v1,n1,t1);
+		var iv2 = makeVertex(v2,n2,t2);
+		t.v0 = tmpData.avertexes[iv0];
+		t.v1 = tmpData.avertexes[iv1];
+		t.v2 = tmpData.avertexes[iv2];
 		// calculate face-normal
 		t.n = new h3d.internal.Normal(tmpData.v0);
 		t.n.x = (t.v0.n.x + t.v1.n.x + t.v2.n.x) / 3;

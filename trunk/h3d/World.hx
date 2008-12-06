@@ -128,12 +128,8 @@ class World {
 		var t = flash.Lib.getTimer();
 		var m = new h3d.Matrix();
 		r.triangles = new flash.Vector();
-		var vbuf = r.vertexes;
 		var tbuf = r.triangles;
-		var uvbuf = r.uvcoords;
-		var lbuf = r.lightning;
-		var cbuf = r.colors;
-		var vindex = 0, tindex = 0, uvindex = 0, lindex = 0, cindex = 0;
+		var tindex = 0;
 		for( o in objects ) {
 			// precalculate the absolute projection matrix
 			// by taking the object position into account
@@ -151,7 +147,6 @@ class World {
 				}
 				// calculate all triangles-z
 				var t = prim.triangles;
-				var vbase = vindex >> 1;
 				while( t != null ) {
 					var p1 = t.v1.p;
 					var va1 = t.v0.p.sx - p1.sx;
@@ -163,29 +158,16 @@ class World {
 						tbuf[tindex++] = t;
 						// the triangle.z is the average of the three vertexes
 						t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
-						t.ibase = vbase;
 					}
 					t = t.next;
-				}
-				// emit vertexes into buffer
-				var v = prim.vertexes;
-				while( v != null ) {
-					vbuf[vindex++] = v.p.sx;
-					vbuf[vindex++] = v.p.sy;
-					uvbuf[uvindex++] = v.u;
-					uvbuf[uvindex++] = v.v;
-					uvbuf[uvindex++] = v.p.w;
-					v = v.next;
 				}
 				// perform shading
 				switch( prim.material.shade ) {
 				case NoLight:
 					// set all luminance to maximum value
-					v = prim.vertexes;
+					var v = prim.vertexes;
 					while( v != null ) {
-						lbuf[lindex++] = 1.0;
-						lbuf[lindex++] = 0;
-						lbuf[lindex++] = 0;
+						v.lum = 1.0;
 						v = v.next;
 					}
 				case Flat:
@@ -207,12 +189,10 @@ class World {
 							t = t.next;
 						}
 					}
-					// write luminance to output buffer
-					v = prim.vertexes;
+					// use normal luminance for each vertex
+					var v = prim.vertexes;
 					while( v != null ) {
-						lbuf[lindex++] = v.n.lum;
-						lbuf[lindex++] = 0;
-						lbuf[lindex++] = v.p.w;
+						v.lum = v.n.lum;
 						v = v.next;
 					}
 				case Gouraud:
@@ -230,13 +210,14 @@ class World {
 							n = n.next;
 						}
 					}
+					// use normal luminance
+					var v = prim.vertexes;
+					while( v != null ) {
+						v.lum = v.n.lum;
+						v = v.next;
+					}
 					// add point-lights color
 					if( prim.material.pointLights ) {
-						v = prim.vertexes;
-						while( v != null ) {
-							v.lum = v.n.lum;
-							v = v.next;
-						}
 						for( l in plights ) {
 							v = prim.vertexes;
 							while( v != null ) {
@@ -247,25 +228,8 @@ class World {
 								v = v.next;
 							}
 						}
-						// write luminance to output buffer
-						v = prim.vertexes;
-						while( v != null ) {
-							lbuf[lindex++] = v.lum;
-							lbuf[lindex++] = 0;
-							lbuf[lindex++] = v.p.w;
-							v = v.next;
-						}
-					} else {
-						// write luminance to output buffer
-						v = prim.vertexes;
-						while( v != null ) {
-							lbuf[lindex++] = v.n.lum;
-							lbuf[lindex++] = 0;
-							lbuf[lindex++] = v.p.w;
-							v = v.next;
-						}
 					}
-				case VertexColor:
+				case RGBLight:
 					updateLights(m,o.position);
 					// calculate normals luminance
 					var n = prim.normals;
@@ -285,21 +249,16 @@ class World {
 							n = n.next;
 						}
 					}
-					// pad the color buffer with zeroes
-					while( cindex < lindex ) {
-						cbuf[cindex++] = 0;
-						cbuf[cindex++] = 0;
-						cbuf[cindex++] = 0;
+					// set normal colors
+					var v = prim.vertexes;
+					while( v != null ) {
+						v.r = v.n.r;
+						v.g = v.n.g;
+						v.b = v.n.b;
+						v = v.next;
 					}
 					// add point-lights color
 					if( prim.material.pointLights ) {
-						v = prim.vertexes;
-						while( v != null ) {
-							v.r = v.n.r;
-							v.g = v.n.g;
-							v.b = v.n.b;
-							v = v.next;
-						}
 						for( l in plights ) {
 							v = prim.vertexes;
 							while( v != null ) {
@@ -312,29 +271,6 @@ class World {
 								v.b += lum * l.b;
 								v = v.next;
 							}
-						}
-						// write luminance and color to output buffer
-						v = prim.vertexes;
-						while( v != null ) {
-							lbuf[lindex++] = v.r + v.cr;
-							lbuf[lindex++] = 0;
-							lbuf[lindex++] = v.p.w;
-							cbuf[cindex++] = v.g + v.cg;
-							cbuf[cindex++] = v.b + v.cb;
-							cbuf[cindex++] = v.p.w;
-							v = v.next;
-						}
-					} else {
-						// write luminance and color to output buffer
-						v = prim.vertexes;
-						while( v != null ) {
-							lbuf[lindex++] = v.n.r + v.cr;
-							lbuf[lindex++] = 0;
-							lbuf[lindex++] = v.p.w;
-							cbuf[cindex++] = v.n.g + v.cg;
-							cbuf[cindex++] = v.n.b + v.cb;
-							cbuf[cindex++] = v.p.w;
-							v = v.next;
 						}
 					}
 				}
@@ -358,25 +294,81 @@ class World {
 			// render
 			var max = tindex;
 			tindex = 0;
-			var ibuf = new flash.Vector<Int>();
-			var iindex = 0;
 			var mat = tbuf[0].material;
+			var vertexes = new flash.Vector(), vindex = 0;
+			var uvcoords = new flash.Vector(), uvindex = 0;
+			var lightning = new flash.Vector(), lindex = 0;
+			var colors = null, cindex = 0;
+			switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
 			while( tindex < max ) {
 				var t = tbuf[tindex++];
 				if( t.material != mat ) {
 					stats.drawCalls++;
-					r.indexes = ibuf;
+					r.vertexes = vertexes;
+					r.uvcoords = uvcoords;
+					r.lightning = lightning;
+					r.colors = colors;
 					mat.draw(r);
-					ibuf = new flash.Vector<Int>();
-					iindex = 0;
+					vertexes = new flash.Vector(); vindex = 0;
+					uvcoords = new flash.Vector(); uvindex = 0;
+					lightning = new flash.Vector(); lindex = 0;
+					colors = null; cindex = 0;
+					switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
 					mat = t.material;
 				}
-				ibuf[iindex++] = t.ibase + t.iv0;
-				ibuf[iindex++] = t.ibase + t.iv1;
-				ibuf[iindex++] = t.ibase + t.iv2;
+				var v0 = t.v0, v1 = t.v1, v2 = t.v2;
+				var p0 = v0.p, p1 = v1.p, p2 = v2.p;
+				vertexes[vindex++] = p0.sx;
+				vertexes[vindex++] = p0.sy;
+				vertexes[vindex++] = p1.sx;
+				vertexes[vindex++] = p1.sy;
+				vertexes[vindex++] = p2.sx;
+				vertexes[vindex++] = p2.sy;
+				uvcoords[uvindex++] = v0.u;
+				uvcoords[uvindex++] = v0.v;
+				uvcoords[uvindex++] = p0.w;
+				uvcoords[uvindex++] = v1.u;
+				uvcoords[uvindex++] = v1.v;
+				uvcoords[uvindex++] = p1.w;
+				uvcoords[uvindex++] = v2.u;
+				uvcoords[uvindex++] = v2.v;
+				uvcoords[uvindex++] = p2.w;
+				if( colors == null ) {
+					lightning[lindex++] = v0.lum;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p0.w;
+					lightning[lindex++] = v1.lum;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p1.w;
+					lightning[lindex++] = v2.lum;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p2.w;
+				} else {
+					lightning[lindex++] = v0.r + v0.cr;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p0.w;
+					lightning[lindex++] = v1.r + v1.cr;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p1.w;
+					lightning[lindex++] = v2.r + v2.cr;
+					lightning[lindex++] = 0.;
+					lightning[lindex++] = p2.w;
+					colors[cindex++] = v0.g + v0.cg;
+					colors[cindex++] = v0.b + v0.cb;
+					colors[cindex++] = p0.w;
+					colors[cindex++] = v1.g + v1.cg;
+					colors[cindex++] = v1.b + v1.cb;
+					colors[cindex++] = p1.w;
+					colors[cindex++] = v2.g + v2.cg;
+					colors[cindex++] = v2.b + v2.cb;
+					colors[cindex++] = p2.w;
+				}
 			}
 			stats.drawCalls++;
-			r.indexes = ibuf;
+			r.vertexes = vertexes;
+			r.uvcoords = uvcoords;
+			r.lightning = lightning;
+			r.colors = colors;
 			mat.draw(r);
 
 			dt = flash.Lib.getTimer() - t;
