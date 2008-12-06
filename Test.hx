@@ -47,7 +47,7 @@ class Test {
 		var m = flash.Lib.as(mat,h3d.material.ColorMaterial);
 		if( m != null ) color = m.ambient.add(m.diffuse);
 		var m = flash.Lib.as(mat,h3d.material.BitmapMaterial);
-		if( m != null ) color = m.ambient;
+		if( m != null ) color = getColor(m.sub);
 		var m = flash.Lib.as(mat,h3d.material.WireMaterial);
 		if( m != null ) color = m.color;
 		if( color == null ) color = new h3d.material.Color(0.5,0.5,0.5,1);
@@ -64,7 +64,7 @@ class Test {
 					p.p.setMaterial(new h3d.material.WireMaterial(color));
 				}
 		case "P".code:
-			var vcolor = new h3d.material.VColorMaterial();
+			var vcolor = new h3d.material.RGBMaterial();
 			for( o in world.listObjects() )
 				for( p in o.primitives ) {
 					var color = getColor(p.p.material).scale(0.3);
@@ -77,7 +77,13 @@ class Test {
 						v = v.next;
 					}
 					// set vertex color material
-					p.p.setMaterial(vcolor);
+					var bmat = flash.Lib.as(p.p.material,h3d.material.BitmapMaterial);
+					if( bmat == null )
+						p.p.setMaterial(vcolor);
+					else {
+						bmat.sub = vcolor;
+						bmat.shade = h3d.material.ShadeModel.RGBLight;
+					}
 				}
 		case "Q".code:
 			var qualities = [flash.display.StageQuality.BEST,flash.display.StageQuality.HIGH,flash.display.StageQuality.MEDIUM,flash.display.StageQuality.LOW];
@@ -133,8 +139,10 @@ class Test {
 
 	static function main() {
 
-		flash.Lib.current.stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
-		flash.Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
+		var stage = flash.Lib.current.stage;
+		stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
+		stage.align = flash.display.StageAlign.TOP_LEFT;
+		stage.quality = flash.display.StageQuality.MEDIUM;
 
 		var mc = flash.Lib.current;
 		inst = new Test(mc);

@@ -15,7 +15,7 @@ class Stats {
 	public var timeLag : Float;
 
 	public function new() {
-		timeLag = 0.9;
+		timeLag = 0.95;
 		transformTime = 0;
 		materialTime = 0;
 		sortTime = 0;

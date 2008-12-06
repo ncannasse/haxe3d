@@ -1,6 +1,7 @@
 ﻿<haxe selected="0">
   <output name="Flash10" mode="swf9" out="h3d.swf" class="Test" lib="" cmd="h3d.html" main="True" debug="False">-swf-version 10
--swf-header 800:600:40</output>
+-swf-header 800:600:40
+-lib format</output>
   <files path="/">
     <dir path="h3d">
       <dir path="internal">
@@ -20,10 +21,10 @@
         <file path="h3d\material\ColorMaterial.hx" />
         <file path="h3d\material\Light.hx" />
         <file path="h3d\material\Material.hx" />
+        <file path="h3d\material\RGBMaterial.hx" />
         <file path="h3d\material\ShadeModel.hx" />
         <file path="h3d\material\Texture.hx" />
         <file path="h3d\material\UV.hx" />
-        <file path="h3d\material\VColorMaterial.hx" />
         <file path="h3d\material\WireMaterial.hx" />
       </dir>
       <dir path="prim">

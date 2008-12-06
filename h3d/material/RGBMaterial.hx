@@ -1,13 +1,15 @@
 package h3d.material;
+import format.pbj.Data;
 
-class VColorMaterial extends Material {
+class RGBMaterial extends Material {
 
 	var bmpR : flash.display.BitmapData;
 	var bmpGB : flash.display.BitmapData;
+	var shader : flash.display.Shader;
 
 	public function new() {
 		super();
-		shade = ShadeModel.VertexColor;
+		shade = ShadeModel.RGBLight;
 		init();
 	}
 
@@ -34,11 +36,9 @@ class VColorMaterial extends Material {
 		var g = r.display.getContext(flash.display.BlendMode.NORMAL);
 		g.beginBitmapFill(bmpR,null,false,false);
 		g.drawTriangles(r.vertexes,r.indexes,r.lightning);
-		g.endFill();
 		g = r.display.getContext(flash.display.BlendMode.ADD);
 		g.beginBitmapFill(bmpGB,null,false,false);
 		g.drawTriangles(r.vertexes,r.indexes,r.colors);
-		g.endFill();
 	}
 
 }

@@ -3,3 +3,4 @@
 -main Test
 -swf-version 10
 -swf-header 800:600:40
+-lib format
