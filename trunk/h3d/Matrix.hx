@@ -36,7 +36,7 @@ class Matrix {
 		_41 = 0.0; _42 = 0.0; _43 = 0.0; _44 = 1.0;
 	}
 
-	public function rotateX( a : Float ) {
+	public function initRotateX( a : Float ) {
 		var cos = Math.cos(a);
 		var sin = Math.sin(a);
 		_11 = 1.0; _12 = 0.0; _13 = 0.0; _14 = 0.0;
@@ -45,7 +45,7 @@ class Matrix {
 		_41 = 0.0; _42 = 0.0; _43 = 0.0; _44 = 1.0;
 	}
 
-	public function rotateY( a : Float ) {
+	public function initRotateY( a : Float ) {
 		var cos = Math.cos(a);
 		var sin = Math.sin(a);
 		_11 = cos; _12 = 0.0; _13 = -sin; _14 = 0.0;
@@ -54,7 +54,7 @@ class Matrix {
 		_41 = 0.0; _42 = 0.0; _43 = 0.0; _44 = 1.0;
 	}
 
-	public function rotateZ( a : Float ) {
+	public function initRotateZ( a : Float ) {
 		var cos = Math.cos(a);
 		var sin = Math.sin(a);
 		_11 = cos; _12 = sin; _13 = 0.0; _14 = 0.0;
@@ -63,14 +63,20 @@ class Matrix {
 		_41 = 0.0; _42 = 0.0; _43 = 0.0; _44 = 1.0;
 	}
 
-	public function translate( x : Float, y : Float, z : Float ) {
+	public function initTranslate( x : Float, y : Float, z : Float ) {
 		_11 = 1.0; _12 = 0.0; _13 = 0.0; _14 = 0.0;
 		_21 = 0.0; _22 = 1.0; _23 = 0.0; _24 = 0.0;
 		_31 = 0.0; _32 = 0.0; _33 = 1.0; _34 = 0.0;
 		_41 = x; _42 = y; _43 = z; _44 = 1.0;
 	}
 
-	public function scale( x : Float, y : Float, z : Float ) {
+	public inline function translate( x : Float, y : Float, z : Float ) {
+		_41 += x;
+		_42 += y;
+		_43 += z;
+	}
+
+	public function initScale( x : Float, y : Float, z : Float ) {
 		_11 = x; _12 = 0.0; _13 = 0.0; _14 = 0.0;
 		_21 = 0.0; _22 = y; _23 = 0.0; _24 = 0.0;
 		_31 = 0.0; _32 = 0.0; _33 = z; _34 = 0.0;

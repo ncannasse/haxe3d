@@ -10,11 +10,13 @@ class World {
 	var dlights : haxe.FastList<h3d.internal.LightInst>;
 	var objects : haxe.FastList<h3d.Object>;
 	var r : h3d.internal.RenderInfos;
+	var tmp : h3d.Vector;
 
 	public function new( display, camera ) {
 		this.camera = camera;
 		this.display = display;
 		axisSize = 0;
+		tmp = new h3d.Vector();
 		objects = new haxe.FastList<h3d.Object>();
 		plights = new haxe.FastList<h3d.internal.LightInst>();
 		dlights = new haxe.FastList<h3d.internal.LightInst>();
@@ -393,31 +395,20 @@ class World {
 	}
 
 	public function drawPoint( p : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
-		var pt = new Vector();
 		var g = display.getContext(flash.display.BlendMode.NORMAL);
-		pt.x = camera.target.x + p.x;
-		pt.y = camera.target.y + p.y;
-		pt.z = camera.target.x + p.z;
-		camera.m.project(pt,pt);
+		camera.m.project(p,tmp);
 		g.beginFill(color.argb,color.a);
-		g.drawCircle(pt.x,pt.y,size);
+		g.drawCircle(tmp.x,tmp.y,size);
 		g.endFill();
 	}
 
 	public function drawLine( p : h3d.Vector, p2 : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
-		var pt = new Vector();
 		var g = display.getContext(flash.display.BlendMode.NORMAL);
 		g.lineStyle(size,color.argb,color.a);
-		pt.x = camera.target.x + p.x;
-		pt.y = camera.target.y + p.y;
-		pt.z = camera.target.x + p.z;
-		camera.m.project(pt,pt);
-		g.moveTo(pt.x,pt.y);
-		pt.x = camera.target.x + p2.x;
-		pt.y = camera.target.y + p2.y;
-		pt.z = camera.target.x + p2.z;
-		camera.m.project(pt,pt);
-		g.lineTo(pt.x,pt.y);
+		camera.m.project(p,tmp);
+		g.moveTo(tmp.x,tmp.y);
+		camera.m.project(p2,tmp);
+		g.lineTo(tmp.x,tmp.y);
 		g.lineStyle();
 	}
 
