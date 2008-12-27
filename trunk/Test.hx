@@ -11,15 +11,17 @@ class Test {
 	var cam : h3d.Camera;
 	var time : Float;
 	var collada : h3d.tools.Collada;
-	var czoom :  Float;
+	var xmove : Float;
+	var ymove : Float;
 
 	function new( mc ) {
 		this.mc = mc;
 		var display = new h3d.Display(mc.stage.stageWidth,mc.stage.stageHeight);
 		mc.addChild(display.result);
-		cam = new h3d.Camera(new Vector(10,10,10));
-		czoom = 8;
+		cam = new h3d.Camera();
+		cam.position.set(3,3,1);
 		time = 0;
+		xmove = 0; ymove = 0;
 		light = new h3d.material.Light(new h3d.Vector(0,0,-1),new h3d.material.Color(1,0.1,0.5),false);
 		light2 = new h3d.material.Light(new h3d.Vector(0,0,2),new h3d.material.Color(0,0.5,0),false);
 		world = new h3d.World( display, cam );
@@ -39,7 +41,8 @@ class Test {
 			world.addObject( o );
 		var me = this;
 		mc.addEventListener(flash.events.Event.ENTER_FRAME,function(_) inst.render());
-		mc.stage.addEventListener(flash.events.KeyboardEvent.KEY_UP,function(e:flash.events.KeyboardEvent) me.onKey(e.keyCode));
+		mc.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN,function(e:flash.events.KeyboardEvent) me.onKeyDown(e.keyCode));
+		mc.stage.addEventListener(flash.events.KeyboardEvent.KEY_UP,function(e:flash.events.KeyboardEvent) me.onKeyUp(e.keyCode));
 	}
 
 	function getColor( mat : h3d.material.Material ) {
@@ -54,7 +57,16 @@ class Test {
 		return color;
 	}
 
-	function onKey( k : Int ) {
+	function onKeyDown( k : Int ) {
+		switch( k ) {
+		case K.DOWN: xmove = -0.1;
+		case K.UP: xmove = 0.1;
+		case K.LEFT: ymove = -0.1;
+		case K.RIGHT: ymove = 0.1;
+		}
+	}
+
+	function onKeyUp( k : Int ) {
 		switch( k ) {
 		case "W".code:
 			for( o in world.listObjects() )
@@ -97,23 +109,29 @@ class Test {
 				}
 			qpos++;
 			mc.stage.quality = qualities[qpos % qualities.length];
-		case K.DOWN:
-			czoom *= 1.15;
-		case K.UP:
-			czoom /= 1.15;
+		case K.DOWN, K.UP:
+			xmove = 0;
+		case K.LEFT, K.RIGHT:
+			ymove = 0;
 		}
 	}
 
 	function render() {
-		// haxe.Log.clear();
 		// update camera depending on mouse position
-		var cp = world.camera.position;
-		cp.z = (world.display.height / 2 - mc.mouseY) / (world.display.height / 2);
-		var p = ((mc.mouseX / world.display.width) - 0.5) * 1.5 + 0.5;
-		cp.x = (1 - p);
-		cp.y = p;
-		cp.scale(czoom / cp.length());
-
+		haxe.Log.clear();
+		var dy = (mc.mouseY / world.display.height - 0.5) * 2;
+		var dx = (mc.mouseX / world.display.width - 0.5) * 2;
+		var p = world.camera.position;
+		var t = world.camera.target;
+		var dt = t.sub(p);
+		dt.normalize();
+		var lt = dt.cross(world.camera.up);
+		lt.normalize();
+		p.x += dt.x * xmove + lt.x * ymove;
+		p.y += dt.y * xmove + lt.y * ymove;
+		p.z += dt.z * xmove + lt.z * ymove;
+		var a = (-dx * 1.2 + 1) * Math.PI;
+		t.set(Math.cos(a) + p.x,Math.sin(a) + p.y,(-dy + 0.3) * 3 + p.z);
 		world.camera.update();
 
 		// rotate light direction
@@ -125,6 +143,7 @@ class Test {
 		light2.position.x = -Math.cos(time/2) * 2;
 		light2.position.y = -Math.sin(time/3) * 4;
 		light2.position.z = light2.directional ? -2 : 2;
+
 		// render
 		world.beginRender();
 		world.renderObjects();

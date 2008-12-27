@@ -1,0 +1,5 @@
+<project name="haxe3d" url="http://code.google.com/p/haxe3d" license="BSD">
+    <user name="ncannasse"/>
+    <description>A lightweight and fast haXe 3D Engine for Flash10.</description>
+    <version name="1.0">See CHANGES.txt</version>
+</project>

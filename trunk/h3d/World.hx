@@ -132,6 +132,7 @@ class World {
 		r.triangles = new flash.Vector();
 		var tbuf = r.triangles;
 		var tindex = 0;
+		var wmin = camera.wmin, wmax = camera.wmax;
 		for( o in objects ) {
 			// precalculate the absolute projection matrix
 			// by taking the object position into account
@@ -150,16 +151,17 @@ class World {
 				// calculate all triangles-z
 				var t = prim.triangles;
 				while( t != null ) {
+					var p0 = t.v0.p;
 					var p1 = t.v1.p;
-					var va1 = t.v0.p.sx - p1.sx;
-					var vb1 = t.v0.p.sy - p1.sy;
-					var va2 = t.v2.p.sx - p1.sx;
-					var vb2 = t.v2.p.sy - p1.sy;
-					// culling
-					if( va2*vb1-va1*vb2 < 0 ) {
-						tbuf[tindex++] = t;
-						// the triangle.z is the average of the three vertexes
-						t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
+					var p2 = t.v2.p;
+					// backface culling
+					if( (p2.sx - p1.sx) * (p0.sy - p1.sy) - (p0.sx - p1.sx) * (p2.sy - p1.sy) < 0 ) {
+						// camera z-clipping
+						if( p0.w > wmin && p0.w < wmax && p1.w > wmin && p1.w < wmax && p2.w > wmin && p2.w < wmax ) {
+							tbuf[tindex++] = t;
+							// we will sort triangles depending of this sum (same as average)
+							t.z = t.v0.p.w + t.v1.p.w + t.v2.p.w;
+						}
 					}
 					t = t.next;
 				}
@@ -285,98 +287,100 @@ class World {
 		stats.transformTime = stats.transformTime * stats.timeLag + (1 - stats.timeLag) * dt;
 		t += dt;
 
-		if( tindex > 0 ) {
-			// sort triangles
-			quicksort(0,tbuf.length - 1);
+		if( tindex == 0 )
+			return;
 
-			dt = flash.Lib.getTimer() - t;
-			stats.sortTime = stats.sortTime * stats.timeLag + (1 - stats.timeLag) * dt;
-			t += dt;
+		// sort triangles
+		quicksort(0,tbuf.length - 1);
+		dt = flash.Lib.getTimer() - t;
+		stats.sortTime = stats.sortTime * stats.timeLag + (1 - stats.timeLag) * dt;
+		t += dt;
 
-			// render
-			var max = tindex;
-			tindex = 0;
-			var mat = tbuf[0].material;
-			var vertexes = new flash.Vector(), vindex = 0;
-			var uvcoords = new flash.Vector(), uvindex = 0;
-			var lightning = new flash.Vector(), lindex = 0;
-			var colors = null, cindex = 0;
-			switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
-			while( tindex < max ) {
-				var t = tbuf[tindex++];
-				if( t.material != mat ) {
-					stats.drawCalls++;
-					r.vertexes = vertexes;
-					r.uvcoords = uvcoords;
-					r.lightning = lightning;
-					r.colors = colors;
-					mat.draw(r);
-					vertexes = new flash.Vector(); vindex = 0;
-					uvcoords = new flash.Vector(); uvindex = 0;
-					lightning = new flash.Vector(); lindex = 0;
-					colors = null; cindex = 0;
-					switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
-					mat = t.material;
-				}
-				var v0 = t.v0, v1 = t.v1, v2 = t.v2;
-				var p0 = v0.p, p1 = v1.p, p2 = v2.p;
-				vertexes[vindex++] = p0.sx;
-				vertexes[vindex++] = p0.sy;
-				vertexes[vindex++] = p1.sx;
-				vertexes[vindex++] = p1.sy;
-				vertexes[vindex++] = p2.sx;
-				vertexes[vindex++] = p2.sy;
-				uvcoords[uvindex++] = v0.u;
-				uvcoords[uvindex++] = v0.v;
-				uvcoords[uvindex++] = p0.w;
-				uvcoords[uvindex++] = v1.u;
-				uvcoords[uvindex++] = v1.v;
-				uvcoords[uvindex++] = p1.w;
-				uvcoords[uvindex++] = v2.u;
-				uvcoords[uvindex++] = v2.v;
-				uvcoords[uvindex++] = p2.w;
-				if( colors == null ) {
-					lightning[lindex++] = v0.lum;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p0.w;
-					lightning[lindex++] = v1.lum;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p1.w;
-					lightning[lindex++] = v2.lum;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p2.w;
-				} else {
-					lightning[lindex++] = v0.r + v0.cr;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p0.w;
-					lightning[lindex++] = v1.r + v1.cr;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p1.w;
-					lightning[lindex++] = v2.r + v2.cr;
-					lightning[lindex++] = 0.;
-					lightning[lindex++] = p2.w;
-					colors[cindex++] = v0.g + v0.cg;
-					colors[cindex++] = v0.b + v0.cb;
-					colors[cindex++] = p0.w;
-					colors[cindex++] = v1.g + v1.cg;
-					colors[cindex++] = v1.b + v1.cb;
-					colors[cindex++] = p1.w;
-					colors[cindex++] = v2.g + v2.cg;
-					colors[cindex++] = v2.b + v2.cb;
-					colors[cindex++] = p2.w;
-				}
+		// render triangles groups
+		var max = tindex;
+		tindex = 0;
+		var mat = tbuf[tindex].material;
+		var vertexes = new flash.Vector(), vindex = 0;
+		var uvcoords = new flash.Vector(), uvindex = 0;
+		var lightning = new flash.Vector(), lindex = 0;
+		var colors = null, cindex = 0;
+		switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
+		while( tindex < max ) {
+			var t = tbuf[tindex++];
+			if( t.material != mat ) {
+				stats.drawCalls++;
+				r.vertexes = vertexes;
+				r.uvcoords = uvcoords;
+				r.lightning = lightning;
+				r.colors = colors;
+				mat.draw(r);
+				vertexes = new flash.Vector(); vindex = 0;
+				uvcoords = new flash.Vector(); uvindex = 0;
+				lightning = new flash.Vector(); lindex = 0;
+				colors = null; cindex = 0;
+				switch( mat.shade ) { case RGBLight: colors = new flash.Vector(); default : };
+				mat = t.material;
 			}
-			stats.drawCalls++;
-			r.vertexes = vertexes;
-			r.uvcoords = uvcoords;
-			r.lightning = lightning;
-			r.colors = colors;
-			mat.draw(r);
-
-			dt = flash.Lib.getTimer() - t;
-			stats.materialTime = stats.materialTime * stats.timeLag + (1 - stats.timeLag) * dt;
-			t += dt;
+			var v0 = t.v0, v1 = t.v1, v2 = t.v2;
+			var p0 = v0.p, p1 = v1.p, p2 = v2.p;
+			vertexes[vindex++] = p0.sx;
+			vertexes[vindex++] = p0.sy;
+			vertexes[vindex++] = p1.sx;
+			vertexes[vindex++] = p1.sy;
+			vertexes[vindex++] = p2.sx;
+			vertexes[vindex++] = p2.sy;
+			uvcoords[uvindex++] = v0.u;
+			uvcoords[uvindex++] = v0.v;
+			uvcoords[uvindex++] = p0.w;
+			uvcoords[uvindex++] = v1.u;
+			uvcoords[uvindex++] = v1.v;
+			uvcoords[uvindex++] = p1.w;
+			uvcoords[uvindex++] = v2.u;
+			uvcoords[uvindex++] = v2.v;
+			uvcoords[uvindex++] = p2.w;
+			if( colors == null ) {
+				lightning[lindex++] = v0.lum;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p0.w;
+				lightning[lindex++] = v1.lum;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p1.w;
+				lightning[lindex++] = v2.lum;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p2.w;
+			} else {
+				lightning[lindex++] = v0.r + v0.cr;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p0.w;
+				lightning[lindex++] = v1.r + v1.cr;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p1.w;
+				lightning[lindex++] = v2.r + v2.cr;
+				lightning[lindex++] = 0.;
+				lightning[lindex++] = p2.w;
+				colors[cindex++] = v0.g + v0.cg;
+				colors[cindex++] = v0.b + v0.cb;
+				colors[cindex++] = p0.w;
+				colors[cindex++] = v1.g + v1.cg;
+				colors[cindex++] = v1.b + v1.cb;
+				colors[cindex++] = p1.w;
+				colors[cindex++] = v2.g + v2.cg;
+				colors[cindex++] = v2.b + v2.cb;
+				colors[cindex++] = p2.w;
+			}
 		}
+		// last draw
+		stats.drawCalls++;
+		r.vertexes = vertexes;
+		r.uvcoords = uvcoords;
+		r.lightning = lightning;
+		r.colors = colors;
+		mat.draw(r);
+
+		// update statistics
+		dt = flash.Lib.getTimer() - t;
+		stats.materialTime = stats.materialTime * stats.timeLag + (1 - stats.timeLag) * dt;
+		t += dt;
 	}
 
 	public function finishRender() {
@@ -396,18 +400,24 @@ class World {
 
 	public function drawPoint( p : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
 		var g = display.getContext(flash.display.BlendMode.NORMAL);
-		camera.m.project(p,tmp);
+		var w = camera.m.project(p,tmp);
+		if( w < camera.wmin || w > camera.wmax )
+			return;
 		g.beginFill(color.argb,color.a);
 		g.drawCircle(tmp.x,tmp.y,size);
 	}
 
 	public function drawLine( p : h3d.Vector, p2 : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
+		var w = camera.m.project(p,tmp);
+		if( w < camera.wmin || w > camera.wmax )
+			return;
 		var g = display.getContext(flash.display.BlendMode.NORMAL);
+		g.moveTo(tmp.x,tmp.y);
+		w = camera.m.project(p2,tmp);
+		if( w < camera.wmin || w > camera.wmax )
+			return;
 		g.endFill();
 		g.lineStyle(size,color.argb,color.a);
-		camera.m.project(p,tmp);
-		g.moveTo(tmp.x,tmp.y);
-		camera.m.project(p2,tmp);
 		g.lineTo(tmp.x,tmp.y);
 		g.lineStyle();
 	}
