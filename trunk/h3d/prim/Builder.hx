@@ -9,9 +9,6 @@ class Builder extends Primitive {
 	var vtcoords : flash.Vector<h3d.material.UV>;
 	var vzero : h3d.Vector;
 
-	public function new() {
-	}
-
 	public function init( points : flash.Vector<h3d.Vector>, normals : flash.Vector<h3d.Vector>, ?tcoords : flash.Vector<h3d.material.UV> ) {
 		if( tcoords == null ) {
 			tcoords = new flash.Vector();
@@ -32,10 +29,10 @@ class Builder extends Primitive {
 			vnormals[i++] = new h3d.internal.Normal(n);
 		vtcoords = tcoords;
 		vzero = new h3d.Vector(0,0,0);
-		triangles = null;
 		points = null;
 		normals = null;
 		vertexes = null;
+		triangles = null;
 	}
 
 	function makeVertex( v, n, t ) : Int {
@@ -54,7 +51,7 @@ class Builder extends Primitive {
 		return idx;
 	}
 
-	public function addTriangle( v0, v1, v2, n0, n1, n2, t0, t1, t2 ) {
+	public function addTriangle( v0, v1, v2, n0, n1, n2, ?t0 = 0, ?t1 = 0, ?t2 = 0 ) {
 		var t = new h3d.internal.Triangle();
 		var iv0 = makeVertex(v0,n0,t0);
 		var iv1 = makeVertex(v1,n1,t1);
@@ -70,6 +67,19 @@ class Builder extends Primitive {
 		t.material = material;
 		t.next = triangles;
 		triangles = t;
+	}
+
+	public function assignTo( p : Primitive ) {
+		p.points = points;
+		p.normals = normals;
+		p.vertexes = vertexes;
+		p.triangles = triangles;
+		p.material = material;
+		points = null;
+		normals = null;
+		vertexes = null;
+		triangles = null;
+		// keep material
 	}
 
 	public function done() {

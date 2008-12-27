@@ -9,6 +9,10 @@ class Primitive {
 	public var triangles : h3d.internal.Triangle;
 	public var material(default,null) : h3d.material.Material;
 
+	public function new(material) {
+		this.material = material;
+	}
+
 	public function setMaterial( m ) {
 		this.material = m;
 		var t = triangles;

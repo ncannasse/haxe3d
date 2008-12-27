@@ -399,11 +399,11 @@ class World {
 		camera.m.project(p,tmp);
 		g.beginFill(color.argb,color.a);
 		g.drawCircle(tmp.x,tmp.y,size);
-		g.endFill();
 	}
 
 	public function drawLine( p : h3d.Vector, p2 : h3d.Vector, color : h3d.material.Color, ?size = 1.0 ) {
 		var g = display.getContext(flash.display.BlendMode.NORMAL);
+		g.endFill();
 		g.lineStyle(size,color.argb,color.a);
 		camera.m.project(p,tmp);
 		g.moveTo(tmp.x,tmp.y);

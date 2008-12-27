@@ -40,6 +40,12 @@ class Vector {
 		z *= k;
 	}
 
+	public function set(x,y,z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
 	public inline function scale( f : Float ) {
 		x *= f;
 		y *= f;
