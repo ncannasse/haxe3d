@@ -212,10 +212,19 @@ class Matrix {
 		var px = _11 * v.x + _21 * v.y + _31 * v.z + _41;
 		var py = _12 * v.x + _22 * v.y + _32 * v.z + _42;
 		var pz = _13 * v.x + _23 * v.y + _33 * v.z + _43;
-		var pw = _14 * v.x + _24 * v.y + _34 * v.z + _44;
-		pw = 1.0 / pw;
-		out.x = px * pw;
-		out.y = py * pw;
+		var w = 1.0 / (_14 * v.x + _24 * v.y + _34 * v.z + _44);
+		out.x = px * w;
+		out.y = py * w;
+		out.z = pz;
+		return w;
+	}
+
+	public inline function transform( v : Vector, out : Vector ) {
+		var px = _11 * v.x + _21 * v.y + _31 * v.z + _41;
+		var py = _12 * v.x + _22 * v.y + _32 * v.z + _42;
+		var pz = _13 * v.x + _23 * v.y + _33 * v.z + _43;
+		out.x = px;
+		out.y = py;
 		out.z = pz;
 	}
 

@@ -1,6 +1,8 @@
 2008-12-27
 	defined Builder extends Primitive
 	bugfix for drawPoint and drawLine
+	added triangle near/far Z clipping
+	changed Test (enable to fly around)
 
 2008-11-16
 	support for multiple lights

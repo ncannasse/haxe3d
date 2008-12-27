@@ -5,34 +5,40 @@ class Camera {
 	public var position : Vector;
 	public var target : Vector;
 	public var up : Vector;
-	
+
 	public var mcam : Matrix;
 	public var mproj : Matrix;
 	public var m : Matrix;
+	public var wmin : Float;
+	public var wmax : Float;
 
 	public function new( ?pos : Vector, ?target : Vector, ?up : Vector ) {
-		
+
 		this.position = (pos == null) ? new Vector(0,-100,0) : pos;
 		this.target = (target == null) ? new Vector(0,0,0) : target;
 		this.up = (up == null) ? new Vector(0,0,1) : up;
-		
+
 		mcam = new Matrix();
 		mproj = new Matrix();
 		m = new Matrix();
-		updateProjection(150,150,Math.PI/4,50,1000);
+		updateProjection(150,150,Math.PI/4,1e-10,100);
 		update();
 	}
 
 	public function updateProjection( width : Float, height : Float, fovAngle : Float, zNear : Float, zFar : Float ) {
 		// use Right-Handed
 		var cotan = 1.0 / Math.tan(fovAngle / 2);
-		var q = zFar / (zFar - zNear);
 		mproj.zero();
 		mproj._11 = cotan * width;
 		mproj._22 = cotan * height;
+		// maps (znear,zfar) to (0,zfar)
+		var q = zFar / (zFar - zNear);
 		mproj._33 = q;
+		mproj._43 = -q * zNear;
+		// w = 1/-z
 		mproj._34 = -1;
-		mproj._43 = q * zNear;
+		this.wmin = -1.0/zNear;
+		this.wmax = -1.0/zFar;
 	}
 
 	public function update() {
