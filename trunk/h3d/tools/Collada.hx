@@ -156,8 +156,8 @@ class Collada {
 			for( i in 0...idx.length )
 				indexes[i] = Std.parseInt(idx[i]);
 			// build primitive
-			var p = new h3d.prim.Primitive();
-			p.setDatas(vinf,ninf,tinf);
+			var p = new h3d.prim.Builder();
+			p.init(vinf,ninf,tinf);
 			p.setMaterial(resolve(triangles.att.material,materials));
 			geometries.set("#"+g.att.id,p);
 			// fill triangles
