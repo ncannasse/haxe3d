@@ -9,7 +9,6 @@
         <file path="h3d\internal\Normal.hx" />
         <file path="h3d\internal\Point.hx" />
         <file path="h3d\internal\PrimInst.hx" />
-        <file path="h3d\internal\PrimTmpData.hx" />
         <file path="h3d\internal\RenderInfos.hx" />
         <file path="h3d\internal\Stats.hx" />
         <file path="h3d\internal\Triangle.hx" />
@@ -28,6 +27,7 @@
         <file path="h3d\material\WireMaterial.hx" />
       </dir>
       <dir path="prim">
+        <file path="h3d\prim\Builder.hx" />
         <file path="h3d\prim\Primitive.hx" />
       </dir>
       <dir path="tools">

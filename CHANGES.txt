@@ -1,3 +1,7 @@
+2008-12-27
+	defined Builder extends Primitive
+	bugfix for drawPoint and drawLine
+
 2008-11-16
 	support for multiple lights
 	added points lights
