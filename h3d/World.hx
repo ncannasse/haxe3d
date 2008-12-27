@@ -6,6 +6,7 @@ class World {
 	public var display : h3d.Display;
 	public var axisSize : Float;
 	public var stats : h3d.internal.Stats;
+	public var fog : h3d.material.Color;
 	var plights : haxe.FastList<h3d.internal.LightInst>;
 	var dlights : haxe.FastList<h3d.internal.LightInst>;
 	var objects : haxe.FastList<h3d.Object>;
@@ -133,6 +134,9 @@ class World {
 		var tbuf = r.triangles;
 		var tindex = 0;
 		var wmin = camera.wmin, wmax = camera.wmax;
+		var fogLum = 0.;
+		if( fog != null )
+			fogLum = (fog.r + fog.g + fog.b) / 3;
 		for( o in objects ) {
 			// precalculate the absolute projection matrix
 			// by taking the object position into account
@@ -187,9 +191,11 @@ class World {
 						t = prim.triangles;
 						while( t != null ) {
 							var lum = t.n.x * l.lx + t.n.y * l.ly + t.n.z * l.lz;
-							t.v0.n.lum += lum;
-							t.v1.n.lum += lum;
-							t.v2.n.lum += lum;
+							if( lum > 0 ) {
+								t.v0.n.lum += lum;
+								t.v1.n.lum += lum;
+								t.v2.n.lum += lum;
+							}
 							t = t.next;
 						}
 					}
@@ -210,7 +216,9 @@ class World {
 					for( l in dlights ) {
 						n = prim.normals;
 						while( n != null ) {
-							n.lum += n.x * l.lx + n.y * l.ly + n.z * l.lz;
+							var lum = n.x * l.lx + n.y * l.ly + n.z * l.lz;
+							if( lum > 0 )
+								n.lum += lum;
 							n = n.next;
 						}
 					}
@@ -220,6 +228,14 @@ class World {
 						v.lum = v.n.lum;
 						v = v.next;
 					}
+					// apply fog
+					if( prim.material.useFog && fog != null ) {
+						v = prim.vertexes;
+						while( v != null ) {
+							v.lum -= v.p.w * fogLum;
+							v = v.next;
+						}
+					}
 					// add point-lights color
 					if( prim.material.pointLights ) {
 						for( l in plights ) {
@@ -228,14 +244,16 @@ class World {
 								var dx = l.lx - v.p.x;
 								var dy = l.ly - v.p.y;
 								var dz = l.lz - v.p.z;
-								v.lum += (v.n.x * dx + v.n.y * dy + v.n.z * dz) * l.l.power / (dx * dx + dy * dy + dz * dz);
+								var lum = v.n.x * dx + v.n.y * dy + v.n.z * dz;
+								if( lum > 0 )
+									v.lum += lum * l.l.power / (dx * dx + dy * dy + dz * dz);
 								v = v.next;
 							}
 						}
 					}
 				case RGBLight:
 					updateLights(m,o.position);
-					// calculate normals luminance
+					// calculate normals colors
 					var n = prim.normals;
 					while( n != null ) {
 						n.r = 0;
@@ -247,19 +265,31 @@ class World {
 						n = prim.normals;
 						while( n != null ) {
 							var lum = n.x * l.lx + n.y * l.ly + n.z * l.lz;
-							n.r += lum * l.r;
-							n.g += lum * l.g;
-							n.b += lum * l.b;
+							if( lum > 0 ) {
+								n.r += lum * l.r;
+								n.g += lum * l.g;
+								n.b += lum * l.b;
+							}
 							n = n.next;
 						}
 					}
-					// set normal colors
+					// use normal colors
 					var v = prim.vertexes;
 					while( v != null ) {
 						v.r = v.n.r;
 						v.g = v.n.g;
 						v.b = v.n.b;
 						v = v.next;
+					}
+					// apply fog color
+					if( prim.material.useFog && fog != null ) {
+						v = prim.vertexes;
+						while( v != null ) {
+							v.r -= v.p.w * fog.r;
+							v.g -= v.p.w * fog.g;
+							v.b -= v.p.w * fog.b;
+							v = v.next;
+						}
 					}
 					// add point-lights color
 					if( prim.material.pointLights ) {
@@ -269,10 +299,13 @@ class World {
 								var dx = l.lx - v.p.x;
 								var dy = l.ly - v.p.y;
 								var dz = l.lz - v.p.z;
-								var lum = (v.n.x * dx + v.n.y * dy + v.n.z * dz) / (dx * dx + dy * dy + dz * dz);
-								v.r += lum * l.r;
-								v.g += lum * l.g;
-								v.b += lum * l.b;
+								var lum = v.n.x * dx + v.n.y * dy + v.n.z * dz;
+								if( lum > 0 ) {
+									lum /= dx * dx + dy * dy + dz * dz;
+									v.r += lum * l.r;
+									v.g += lum * l.g;
+									v.b += lum * l.b;
+								}
 								v = v.next;
 							}
 						}

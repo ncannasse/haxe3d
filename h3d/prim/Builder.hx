@@ -69,6 +69,11 @@ class Builder extends Primitive {
 		triangles = t;
 	}
 
+	public function addQuad( v0, v1, v2, v3, n0, n1, n2, n3, ?t0 = 0, ?t1 = 0, ?t2 = 0, ?t3 = 0 ) {
+		addTriangle(v0,v1,v3,n0,n1,n3,t0,t1,t3);
+		addTriangle(v1,v2,v3,n1,n2,n3,t1,t2,t3);
+	}
+
 	public function assignTo( p : Primitive ) {
 		p.points = points;
 		p.normals = normals;

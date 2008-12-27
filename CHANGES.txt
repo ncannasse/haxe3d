@@ -3,6 +3,8 @@
 	bugfix for drawPoint and drawLine
 	added triangle near/far Z clipping
 	changed Test (enable to fly around)
+	prevent backlights to add negative luminance
+	added fog (z-linear)
 
 2008-11-16
 	support for multiple lights

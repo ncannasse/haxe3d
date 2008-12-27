@@ -4,6 +4,7 @@ class Material {
 
 	public var shade : ShadeModel;
 	public var pointLights : Bool;
+	public var useFog : Bool;
 
 	function new() {
 		shade = h3d.Const.DEFAULT_SHADE_MODEL;
