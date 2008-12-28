@@ -1,11 +1,9 @@
 package h3d.material;
-import format.pbj.Data;
 
 class RGBMaterial extends Material {
 
 	var bmpR : flash.display.BitmapData;
 	var bmpGB : flash.display.BitmapData;
-	var shader : flash.display.Shader;
 
 	public function new() {
 		super();
