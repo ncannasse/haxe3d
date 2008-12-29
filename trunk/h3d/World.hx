@@ -3,7 +3,7 @@ package h3d;
 class World {
 
 	public var camera : h3d.Camera;
-	public var display : h3d.Display;
+	public var display(default,setDisplay) : h3d.Display;
 	public var axisSize : Float;
 	public var stats : h3d.internal.Stats;
 	public var fog : h3d.material.Color;
@@ -47,6 +47,12 @@ class World {
 
 	public function listObjects() {
 		return objects.iterator();
+	}
+
+	function setDisplay(d) {
+		this.display = d;
+		r.display = d;
+		return d;
 	}
 
 	function quicksort( lo : Int, hi : Int ) : Void {
