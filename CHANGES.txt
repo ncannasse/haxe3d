@@ -1,3 +1,6 @@
+2008-12-29
+	added UVCube and UVSphere
+	
 2008-12-27
 	defined Builder extends Primitive
 	bugfix for drawPoint and drawLine
