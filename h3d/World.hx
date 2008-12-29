@@ -14,8 +14,6 @@ class World {
 	var tmp : h3d.Vector;
 
 	public function new( display, camera ) {
-		this.camera = camera;
-		this.display = display;
 		axisSize = 0;
 		tmp = new h3d.Vector();
 		objects = new haxe.FastList<h3d.Object>();
@@ -23,6 +21,8 @@ class World {
 		dlights = new haxe.FastList<h3d.internal.LightInst>();
 		stats = new h3d.internal.Stats();
 		r = new h3d.internal.RenderInfos(display);
+		this.camera = camera;
+		this.display = display;
 	}
 
 	public function addObject( o ) {
