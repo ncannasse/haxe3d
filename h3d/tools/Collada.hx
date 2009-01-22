@@ -82,14 +82,15 @@ class Collada {
 			var phong = tech.node.phong;
 			var ambient = parseColor(phong.node.ambient.node.color.innerData);
 			var dif = phong.node.diffuse;
-			var mat = if( dif.hasNode.texture ) {
+			var mat : h3d.material.Material;
+			if( dif.hasNode.texture ) {
 				var sampler = dif.node.texture.att.texture;
 				var img = resolve(resolve(sampler,params),params);
 				var sub = new h3d.material.ColorMaterial(new h3d.material.Color(0,0,0,1),ambient);
-				new h3d.material.BitmapMaterial(sub,resolve(img,textures).texture);
+				mat = new h3d.material.BitmapMaterial(sub,resolve(img,textures).texture);
 			} else if( dif.hasNode.color ) {
 				var col = parseColor(dif.node.color.innerData);
-				new h3d.material.ColorMaterial(ambient,col);
+				mat = new h3d.material.ColorMaterial(ambient,col);
 			} else
 				throw "Unknown diffuse parameters for effect "+e.att.id;
 			matfx.set("#"+e.att.id,mat);
