@@ -134,8 +134,8 @@ class UVSphere extends Primitive {
 				level[index1],
 				level[index2],
 				tleveltop[i],
-				tlevels[tlevels.length-1][i],
-				tlevels[tlevels.length-1][i+1]);
+				tlevels[tlevels.length-1][i+1],
+				tlevels[tlevels.length-1][i]);
 		}
 		builder.done();
 		builder.assignTo(this);
