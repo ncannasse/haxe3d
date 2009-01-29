@@ -21,16 +21,16 @@ class Camera {
 		mcam = new Matrix();
 		mproj = new Matrix();
 		m = new Matrix();
-		updateProjection(150,150,Math.PI/4,1e-10,100);
+		updateProjection(Math.PI/4,1e-10,100);
 		update();
 	}
 
-	public function updateProjection( width : Float, height : Float, fovAngle : Float, zNear : Float, zFar : Float ) {
+	public function updateProjection( fovAngle : Float, zNear : Float, zFar : Float, zoom = 1.0, stretch = 1.0 ) {
 		// use Right-Handed
-		var cotan = 1.0 / Math.tan(fovAngle / 2);
+		var cotan = (zoom * 150.0) / Math.tan(fovAngle / 2);
 		mproj.zero();
-		mproj._11 = cotan * width;
-		mproj._22 = cotan * height;
+		mproj._11 = cotan;
+		mproj._22 = cotan * stretch;
 		// maps (znear,zfar) to (0,zfar)
 		var q = zFar / (zFar - zNear);
 		mproj._33 = q;
