@@ -135,7 +135,7 @@ class World {
 
 		// render triangles to vbuf and tbuf
 		var t = flash.Lib.getTimer();
-		var m = new h3d.Matrix();
+		var m = new h3d.Matrix(), tmp = new h3d.Matrix();
 		r.triangles = new flash.Vector();
 		var tbuf = r.triangles;
 		var tindex = 0;
@@ -185,7 +185,7 @@ class World {
 						v = v.next;
 					}
 				case Flat:
-					updateLights(m,o.position);
+					updateLights(tmp,o.position);
 					// reset normals luminance
 					var n = prim.normals;
 					while( n != null ) {
@@ -212,7 +212,7 @@ class World {
 						v = v.next;
 					}
 				case Gouraud:
-					updateLights(m,o.position);
+					updateLights(tmp,o.position);
 					// calculate normals luminance
 					var n = prim.normals;
 					while( n != null ) {
@@ -258,7 +258,7 @@ class World {
 						}
 					}
 				case RGBLight:
-					updateLights(m,o.position);
+					updateLights(tmp,o.position);
 					// calculate normals colors
 					var n = prim.normals;
 					while( n != null ) {
