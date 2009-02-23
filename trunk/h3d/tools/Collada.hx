@@ -1,16 +1,6 @@
 package h3d.tools;
 
-class Collada {
-
-	public var materials : Hash<h3d.material.Material>;
-	public var textures : Hash<{ file : String, texture : h3d.material.Texture }>;
-	public var objects : Hash<h3d.Object>;
-
-	public function new() {
-		materials = new Hash();
-		textures = new Hash();
-		objects = new Hash();
-	}
+class Collada extends AbstractModelReader {
 
 	function parseColor( s : String ) {
 		var a = s.split(" ");
@@ -189,7 +179,7 @@ class Collada {
 					continue;
 				var obj = new h3d.Object();
 				objects.set(o.att.name,obj);
-				obj.position = parseMatrix(o.node.matrix.innerData);
+				try obj.position = parseMatrix(o.node.matrix.innerData) catch(e:Dynamic) {}
 				obj.addPrimitive( resolve(o.node.instance_geometry.att.url,geometries) );
 			}
 	}
