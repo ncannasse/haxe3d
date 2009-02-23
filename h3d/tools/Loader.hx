@@ -10,7 +10,13 @@ class Loader {
 		queue = new Array();
 	}
 
-	public function add(url,bytes,callb) {
+	/**
+		Adds a url to load.
+		@param url The url to the resource
+		@param bytes Set to true for a Bytes resource, false for DisplayObject resource
+		@param callb
+	**/
+	public function add(url:String, bytes:Bool, callb) {
 		queue.push({ url : url, bytes : bytes, callb : callb });
 	}
 
@@ -25,9 +31,11 @@ class Loader {
 		});
 	}
 
-	public function loadCollada( url : String ) {
+	public function loadCollada( url : String, completeHandler : Void->Void ) {
 		var me = this;
-		var col = new h3d.tools.Collada();
+		if(completeHandler != null)
+			onLoaded = completeHandler;
+		var col = new h3d.tools.Collada( url );
 		add(url,true,function(data:flash.utils.ByteArray) {
 			data.position = 0;
 			var x = Xml.parse(data.readUTFBytes(data.length));
@@ -44,6 +52,15 @@ class Loader {
 			}
 		});
 		return col;
+	}
+
+	public function loadObj( url : String, completeHandler : Void->Void ) {
+		var me = this;
+		var obj = new h3d.tools.ObjReader( url );
+		if(completeHandler != null)
+			obj.onComplete = completeHandler;
+		add( url, true, obj.parse);
+		return obj;
 	}
 
 	public function start() {

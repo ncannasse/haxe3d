@@ -35,6 +35,40 @@ class Builder extends Primitive {
 		triangles = null;
 	}
 
+	/**
+		Creates and adds a new normal to the internal normals list.
+		@param vIdx0 Vertex index
+		@param vIdx1 Vertex index
+		@param vIdx2 Vertex index
+		@return New normal index
+	**/
+	public function createNormal( vIdx0, vIdx1, vIdx2 ) : Int {
+		var rv = vnormals.length;
+		var n = new h3d.Vector();
+		var v0 = vpoints[vIdx0];
+		var v1 = vpoints[vIdx1];
+		var v2 = vpoints[vIdx2];
+		var d1x:Float = v1.x - v0.x;
+		var d1y:Float = v1.y - v0.y;
+		var d1z:Float = v1.z - v0.z;
+
+		var d2x:Float = v2.x - v0.x;
+		var d2y:Float = v2.y - v0.y;
+		var d2z:Float = v2.z - v0.z;
+
+		var pa:Float = d1y*d2z - d1z*d2y;
+		var pb:Float = d1z*d2x - d1x*d2z;
+		var pc:Float = d1x*d2y - d1y*d2x;
+
+		var pdd = Math.sqrt(pa*pa + pb*pb + pc*pc);
+
+		n.x = pa / pdd;
+		n.y = pb / pdd;
+		n.z = pc / pdd;
+		vnormals.push(new h3d.internal.Normal(n));
+		return rv;
+	}
+
 	function makeVertex( v, n, t ) : Int {
 		var vid = (v << 16) | n;
 		var ht = hvertexes[t];

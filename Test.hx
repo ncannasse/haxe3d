@@ -10,7 +10,7 @@ class Test {
 	var light2 : h3d.material.Light;
 	var cam : h3d.Camera;
 	var time : Float;
-	var collada : h3d.tools.Collada;
+	var collada : h3d.tools.AbstractModelReader;
 	var xmove : Float;
 	var ymove : Float;
 
@@ -29,8 +29,8 @@ class Test {
 		world.addLight(light);
 		world.addLight(light2);
 		var loader = new h3d.tools.Loader();
-		collada = loader.loadCollada("res/axisCube.dae");
-		loader.onLoaded = init;
+		collada = loader.loadCollada("res/axisCube.dae", init);
+// 		collada = loader.loadObj("res/axisCube.obj", init);
 		loader.start();
 		var statusPanel = new h3d.tools.StatusPanel( world );
 		mc.addChild( statusPanel );
